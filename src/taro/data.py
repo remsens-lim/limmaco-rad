@@ -72,9 +72,11 @@ def to_l1a(
 
     table_map = np.array([table_config[i] for i in usecols])
 
+    names_with_sfx = [(v+'_'+s).strip('_') for v,s in zip(table_map[:,0],table_map[:,1])]
+
     names = []
-    for i, v in enumerate(table_map[:, 0]):
-        count = list(table_map[:i, 0]).count(v)
+    for i, v in enumerate(names_with_sfx):
+        count = list(table_map[:i, 0]).count(name)
         names.append(v + f"_{count+1:d}" if count > 0 else v)
 
     # parse the data file
@@ -93,7 +95,7 @@ def to_l1a(
     ds = ds.astype(float)  # ensure "NaN" to np.nan
 
     # add meta
-    for name, troposid in zip(names,table_map[:,1]):
+    for name, troposid in zip(names,table_map[:,2]):
         if (name == "record") or (name == "time"):
             continue
         meta = taro.utils.meta_lookup(config,troposID=troposid)

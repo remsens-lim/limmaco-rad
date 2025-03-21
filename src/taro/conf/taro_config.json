@@ -4,17 +4,17 @@
 {
   "path_sfx": "{dt:%Y/%m/}",
   "fname_raw": "{loggername}_{table}.dat",
-  "fname_out" : "{dt:%Y-%m-%d}_taro-core_{campaign}_{table}_{resolution}_{datalvl}.c{collection:02d}.{sfx}",
+  "fname_out" : "{dt:%Y-%m-%d}_limmaco-rad_{campaign}_{table}_{resolution}_{datalvl}.c{collection:02d}.{sfx}",
   "asi16_raw" : "{dt:%Y%m%d%H%M%S}_{shot}.{sfx}",
   "asi16_out" : "{dt:%Y%m%d%H%M%S}_taro-asi16_{campaign}_{shot}.{sfx}",
   "wiser_raw" : "{dt:%Y-%m-%dT%H}_taro-wiser_{campaign}.{sfx}",
   "wiser_out" : "{dt:%Y-%m-%d}_taro-wiser_{campaign}.{sfx}",
   // Config Files
   "file_log": "taro.log",
-  "file_cfmeta": "share/taro_cfmeta.json",
-  "file_calibration": "share/taro_calibration.json",
-  "file_logger_tables": "share/taro_logger_tables.json",
-  "file_instrument_map": "share/taro_instrument_map.json",
+  "file_cfmeta": "share/limmaco-rad_cfmeta.json",
+  "file_calibration": "share/limmaco-rad_calibration.json",
+  "file_logger_tables": "share/limmaco-rad_logger_tables.json",
+  "file_instrument_map": "share/limmaco-rad_instrument_map.json",
   // Meta information
   "campaign": "", // Campaign name
   "project": "", // Project name
@@ -28,9 +28,9 @@
   // wiser config
   "wiser_ids": ["", ""], // Tropos-IDs of [EKO-711, EKO-713]
   // to_l1a config
-  "logger_name": "CR1000X", // Loggernet - Loggername
+  "logger_name": "CR1000X_LIMMACO", // Loggernet - Loggername
   // to_l1b config
-  "l1b_flux_variables": ["dni","ghi","dhi","lwd"], // netcdf flux variable names to be calibrated
+  "l1b_flux_variables": ["swd","lwd","swu","lwu"], // netcdf flux variable names to be calibrated
   "l1b_resample_stats": ["min", "max", "std"], // additional statistics from resample for flux variables
   // Additional global attributes to store in the output Dataset
   // e.g., "comment", "acknowledgement"

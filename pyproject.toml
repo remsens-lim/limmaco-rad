@@ -3,11 +3,11 @@ requires = ["setuptools", "wheel", "setuptools_scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "taro"
+name = "limmaco-rad"
 dynamic = ["version"]
-description = "A Python module for handling the data of the Tropos Actris Radiation Observatory (TARO)"
+description = "A Python module for handling the data of the LIMMACO Radiation station"
 authors = [
-    {name = "Jonas Witthuhn", email = "witthuhn@tropos.de"}
+    {name = "Jonas Witthuhn", email = "witthuhn@uni-leipzig.de"}
 ]
 license = {text = "GNU General Public License v3 (GPLv3)"}
 requires-python = ">=3.10"

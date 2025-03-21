@@ -1,0 +1,663 @@
+{
+  "attributes": {
+        "title"           : "LIMMACO-Rad observations",
+        "institution"     : "Leipzig University, Institute for Meteorology",
+        "department"      : "Remote Sensing",
+        "address"         : "Stefanstr. 3, 04103 Leipzig, Germany",
+        "source"          : "LIMMACO-Rad",
+        "contact_person"  : "Heike Kalesse-Los, mailto:heike.kalesse@uni-leipzig.de",
+        "contributor_name": "{contributor_name}",
+        "contributor_role": "{contributor_role}",
+        "authors_software": "Jonas Witthuhn",
+        "creator_name"    : "{creator_name}",
+        "project"         : "{project}",
+        "references"      : "https://www.physes.uni-leipzig.de/institut-fuer-meteorologie",
+        "standard_name_vocabulary" : "CF Standard Name Table v81",
+        "conventions"     : "CF-1.10, ACDD-1.3",
+        "license"         : "CC-BY-SA 3.0"
+  },
+  "variables": {
+    "sensor_temperature": {
+      "type": "u2",
+      "attributes": {
+        "units": "K",
+        "long_name": "sensor temperature",
+        "standard_name": "temperature_of_sensor",
+        "scale_factor": 0.0016,
+        "add_offset": 243.15,
+        "_FillValue": 65535,
+        "valid_range": [
+          0,
+          62500
+        ],
+        "zlib": true
+      }
+    },
+    "sensor_mv01_freq": {
+      "type": "i1",
+      "attributes": {
+        "units": "Hz",
+        "long_name": "sensor ventilator rotation frequency",
+        "comment": "normal operation is at around 100Hz",
+        "standard_name": "frequency",
+        "scale_factor": 1.0,
+        "add_offset": 100.0,
+        "_FillValue":-128,
+        "valid_range": [
+          -100,100
+        ],
+        "zlib": true
+      }
+    },
+    "sensor_exposure": {
+      "type": "u2",
+      "attributes": {
+        "units": "ms",
+        "long_name": "sensor exposure",
+        "standard_name": "exposure_of_sensor",
+        "scale_factor": 1,
+        "add_offset": 0,
+        "_FillValue": 65535,
+        "valid_range": [
+          0,
+          62500
+        ],
+        "zlib": true
+      }
+    },
+    "sensor_power": {
+      "type": "u2",
+      "attributes": {
+        "units": "V",
+        "long_name": "sensor power",
+        "standard_name": "power_of_sensor",
+        "scale_factor": 0.01,
+        "add_offset": 0,
+        "_FillValue": 65535,
+        "valid_range": [
+          0,
+          62500
+        ],
+        "zlib": true
+      }
+    },
+    "temp_air": {
+      "type": "u2",
+      "attributes": {
+        "units": "K",
+        "long_name": "air temperature",
+        "standard_name": "air_temperature",
+        "scale_factor": 0.0016,
+        "add_offset": 243.15,
+        "_FillValue": 65535,
+        "valid_range": [
+          0,
+          62500
+        ],
+        "zlib": true
+      }
+    },
+    "relative_humidity": {
+      "type": "u2",
+      "attributes": {
+        "units": "1",
+        "long_name": "air relative humidity",
+        "standard_name": "relative_humidity",
+        "scale_factor": 0.000016,
+        "add_offset": 0.0,
+        "valid_range": [
+          0,
+          62500
+        ],
+        "_FillValue": 65535,
+        "zlib": true
+      }
+    },
+    "pressure": {
+      "type": "u2",
+      "attributes": {
+        "units": "Pa",
+        "long_name": "air pressure",
+        "standard_name": "air_pressure",
+        "scale_factor": 0.4,
+        "add_offset": 85000,
+        "valid_range": [
+          0,
+          62500
+        ],
+        "_FillValue": 65535,
+        "zlib": true
+      }
+    },
+    "temp_dew_point": {
+      "type": "u2",
+      "attributes": {
+        "units": "K",
+        "long_name": "air dew point temperature",
+        "standard_name": "dew_point_temperature",
+        "scale_factor": 0.0016,
+        "add_offset": 243.15,
+        "_FillValue": 65535,
+        "valid_range": [
+          0,
+          62500
+        ],
+        "zlib": true
+      }
+    },
+    "temp_wet_bulb": {
+      "type": "u2",
+      "attributes": {
+        "units": "K",
+        "long_name": "air wet bulb temperature",
+        "standard_name": "wet_bulb_temperature",
+        "scale_factor": 0.0016,
+        "add_offset": 243.15,
+        "_FillValue": 65535,
+        "valid_range": [
+          0,
+          62500
+        ],
+        "zlib": true
+      }
+    },
+    "absolute_humidity": {
+      "type": "u2",
+      "attributes":{
+        "units": "g m-3",
+        "long_name": "absolute humidity or mass-concentration of water vapor in air",
+        "standard_name": "mass_concentration_of_water_vapor_in_air",
+        "scale_factor":0.02,
+        "add_offset":0.0,
+        "_FillValue":65535,
+        "valid_range":[
+          0,50000
+        ],
+        "zlib": true
+      }
+    },
+    "humidity_mixing_ratio": {
+      "type": "u2",
+      "attributes":{
+        "units": "g kg-1",
+        "long_name": "humidity mixing ratio",
+        "standard_name": "humidity_mixing_ratio",
+        "scale_factor":0.02,
+        "add_offset":0.0,
+        "_FillValue":65535,
+        "valid_range":[
+          0,50000
+        ],
+        "zlib": true
+      }
+    },
+    "temp_wind_chill": {
+      "type": "u2",
+      "attributes":{
+        "units": "K",
+        "long_name": "wind chill temperature",
+        "standard_name": "wind_chill_of_air_temperature",
+        "scale_factor":0.01,
+        "add_offset":213.15,
+        "_FillValue":65535,
+        "valid_range":[
+          0,11000
+        ],
+        "zlib": true
+      }
+    },
+    "compass": {
+      "type": "u2",
+      "attributes":{
+        "units": "degree",
+        "long_name": "sensor direction north",
+        "standard_name": "sensor_azimuth_angle",
+        "scale_factor":0.01,
+        "add_offset":0.0,
+        "_FillValue":65535,
+        "valid_range":[
+          0,36000
+        ],
+        "zlib": true
+      }
+    },
+    "wind_direction": {
+      "type": "u2",
+      "attributes":{
+        "units": "degree",
+        "long_name": "wind from direction clockwise from north (of sensor)",
+        "standard_name": "wind_from_direction",
+        "scale_factor":0.01,
+        "add_offset":0.0,
+        "_FillValue":65535,
+        "valid_range":[
+          0,36000
+        ],
+        "zlib": true
+      }
+    },
+    "wind_speed": {
+      "type": "u2",
+      "attributes":{
+        "units": "m s-1",
+        "long_name": "wind speed",
+        "standard_name": "wind_speed",
+        "scale_factor":0.01,
+        "add_offset":0.0,
+        "_FillValue":65535,
+        "valid_range":[
+          0,7500
+        ],
+        "zlib": true
+      }
+    },
+    "air_density": {
+      "type": "u2",
+      "attributes":{
+        "units": "kg m-3",
+        "long_name": "air density",
+        "standard_name": "air_density",
+        "scale_factor": 0.001,
+        "add_offset": 0.0,
+        "_FillValue":65535,
+        "valid_range":[
+          0,3000
+        ],
+        "zlib": true
+      }
+    },
+    "specific_enthalpy": {
+      "type": "u2",
+      "attributes": {
+        "units": "kJ kg-1",
+        "long_name": "specific enthalpy of air",
+        "comment": "Parameter of state of the humid air, composed of the specific enthalpies (heat capacity) of the components of the mixture and related to the mass fraction of the dry air (at 0°C).",
+        "standard_name": "specific_enthalpy_of_air",
+        "scale_factor": 0.017,
+        "add_offset": -100,
+        "_FillValue": 65535,
+        "valid_range": [
+          0,
+          64705
+        ],
+        "zlib": true
+      }
+    },
+    "swd_raw": {
+      "type": "u4",
+      "attributes": {
+        "long_name": "surface downwelling shortwave flux, also called global horizontal irradiance (GHI)",
+        "standard_name": "surface_downwelling_shortwave_flux_in_air",
+        "units": "V",
+        "scale_factor": 12e-9,
+        "add_offset": -0.2,
+        "valid_range": [
+          0,
+          33333333
+        ],
+        "_FillValue": 4294967295,
+        "zlib": true
+      }
+    },
+    "swu_raw": {
+      "type": "u4",
+      "attributes": {
+        "long_name": "surface upwelling shortwave flux",
+        "standard_name": "surface_upwelling_shortwave_flux_in_air",
+        "units": "V",
+        "scale_factor": 12e-9,
+        "add_offset": -0.2,
+        "valid_range": [
+          0,
+          33333333
+        ],
+        "_FillValue": 4294967295,
+        "zlib": true
+      }
+    },
+    "dhi_raw": {
+      "type": "u4",
+      "attributes": {
+        "long_name": "surface diffuse downwelling shortwave flux, also called diffuse horizontal irradiance (DHI)",
+        "standard_name": "surface_diffuse_downwelling_shortwave_flux_in_air",
+        "units": "V",
+        "scale_factor": 12e-9,
+        "add_offset": -0.2,
+        "valid_range": [
+          0,
+          33333333
+        ],
+        "_FillValue": 4294967295,
+        "zlib": true
+      }
+    },
+    "dni_raw": {
+      "type": "u4",
+      "attributes": {
+        "long_name": "direct downwelling shortwave flux, also called direct normal irradiance (DNI)",
+        "standard_name": "surface_direct_along_beam_shortwave_flux_in_air",
+        "units": "V",
+        "scale_factor": 12e-9,
+        "add_offset": -0.2,
+        "valid_range": [
+          0,
+          33333333
+        ],
+        "_FillValue": 4294967295,
+        "zlib": true
+      }
+    },
+    "lwd_raw": {
+      "type": "u4",
+      "attributes": {
+        "long_name": "surface downwelling longwave flux",
+        "standard_name": "surface_downwelling_longwave_flux_in_air",
+        "units": "V",
+        "scale_factor": 12e-9,
+        "add_offset": -0.2,
+        "valid_range": [
+          0,
+          33333333
+        ],
+        "_FillValue": 4294967295,
+        "zlib": true
+      }
+    },
+    "lwu_raw": {
+      "type": "u4",
+      "attributes": {
+        "long_name": "surface upwelling longwave flux",
+        "standard_name": "surface_upwelling_longwave_flux_in_air",
+        "units": "V",
+        "scale_factor": 12e-9,
+        "add_offset": -0.2,
+        "valid_range": [
+          0,
+          33333333
+        ],
+        "_FillValue": 4294967295,
+        "zlib": true
+      }
+    },
+    "swd": {
+      "type": "u4",
+      "attributes": {
+        "long_name": "surface downwelling shortwave flux, also called global horizontal irradiance (GHI)",
+        "standard_name": "surface_downwelling_shortwave_flux_in_air",
+        "units": "W m-2",
+        "scale_factor": 5e-7,
+        "add_offset": -10,
+        "valid_range": [
+          0,
+          4000000000
+        ],
+        "_FillValue": 4294967295,
+        "zlib": true
+      }
+    },
+    "swu": {
+      "type": "u4",
+      "attributes": {
+        "long_name": "surface upwelling shortwave flux",
+        "standard_name": "surface_upwelling_shortwave_flux_in_air",
+        "units": "W m-2",
+        "scale_factor": 5e-7,
+        "add_offset": -10,
+        "valid_range": [
+          0,
+          4000000000
+        ],
+        "_FillValue": 4294967295,
+        "zlib": true
+      }
+    },
+    "dhi": {
+      "type": "u4",
+      "attributes": {
+        "long_name": "surface diffuse downwelling shortwave flux, also called diffuse horizontal irradiance (DHI)",
+        "standard_name": "surface_diffuse_downwelling_shortwave_flux_in_air",
+        "units": "W m-2",
+        "scale_factor": 5e-7,
+        "add_offset": -10,
+        "valid_range": [
+          0,
+          4000000000
+        ],
+        "_FillValue": 4294967295,
+        "zlib": true
+      }
+    },
+    "dni": {
+      "type": "u4",
+      "attributes": {
+        "long_name": "direct downwelling shortwave flux, also called direct normal irradiance (DNI)",
+        "standard_name": "surface_direct_along_beam_shortwave_flux_in_air",
+        "units": "W m-2",
+        "scale_factor": 5e-7,
+        "add_offset": -10,
+        "valid_range": [
+          0,
+          4000000000
+        ],
+        "_FillValue": 4294967295,
+        "zlib": true
+      }
+    },
+    "lwd": {
+      "type": "u4",
+      "attributes": {
+        "long_name": "surface downwelling longwave flux",
+        "standard_name": "surface_downwelling_longwave_flux_in_air",
+        "units": "W m-2",
+        "scale_factor": 5e-7,
+        "add_offset": -10,
+        "valid_range": [
+          0,
+          4000000000
+        ],
+        "_FillValue": 4294967295,
+        "zlib": true
+      }
+    },
+    "lwu": {
+      "type": "u4",
+      "attributes": {
+        "long_name": "surface upwelling longwave flux",
+        "standard_name": "surface_upwelling_longwave_flux_in_air",
+        "units": "W m-2",
+        "scale_factor": 5e-7,
+        "add_offset": -10,
+        "valid_range": [
+          0,
+          4000000000
+        ],
+        "_FillValue": 4294967295,
+        "zlib": true
+      }
+    },
+    "dflx_sp": {
+      "type": "u4",
+      "attributes": {
+        "long_name": "surface downwelling spectral radiative flux",
+        "standard_name": "surface_downwelling_spectral_radiative_flux_in_air",
+        "units": "W m-2 nm-1",
+        "scale_factor": 5e-7,
+        "add_offset": -0.2,
+        "valid_range": [
+          0,
+          4000000000
+        ],
+        "_FillValue": 4294967295,
+        "zlib": true
+      }
+    },
+    "sensor_voltage_mV200": {
+      "type": "u4",
+      "attributes": {
+        "units": "V",
+        "scale_factor": 12e-9,
+        "add_offset": -0.2,
+        "valid_range": [
+          0,
+          33333333
+        ],
+        "_FillValue": 4294967295,
+        "zlib": true
+      }
+    },
+    "test_panel": {
+      "type": "i4",
+      "attributes": {
+        "units": "V",
+        "scale_factor": 2.5e-9,
+        "add_offset": 0.0,
+        "valid_range": [
+          -2000000000,
+          2000000000
+        ],
+        "_FillValue": 2147483647,
+        "zlib": true
+      }
+    },
+    "battery_voltage": {
+      "type": "u4",
+      "attributes": {
+        "units": "V",
+        "scale_factor": 5e-9,
+        "add_offset": 0.0,
+        "valid_range": [
+          0,
+          4000000000
+        ],
+        "_FillValue": 4294967295,
+        "zlib": true
+      }
+    },
+    "szen": {
+      "type": "u2",
+      "attributes": {
+        "standard_name": "solar_zenith_angle",
+        "units": "degree",
+        "scale_factor": 0.005,
+        "add_offset": 0.0,
+        "valid_range": [
+          0,
+          36000
+        ],
+        "_FillValue": 65535,
+        "zlib": true
+      }
+    },
+    "sazi": {
+      "type": "u2",
+      "attributes": {
+        "standard_name": "solar_azimuth_angle",
+        "units": "degree",
+        "scale_factor": 0.01,
+        "add_offset": 0.0,
+        "valid_range": [
+          0,
+          36000
+        ],
+        "_FillValue": 65535,
+        "zlib": true
+      }
+    },
+    "esd": {
+      "type": "u2",
+      "attributes": {
+        "standard_name": "earth_sun_distance",
+        "units": "AU",
+        "scale_factor": 0.000001,
+        "add_offset": 0.98,
+        "valid_range": [
+          0,
+          40000
+        ],
+        "_FillValue": 65535,
+        "zlib": true
+      }
+    },
+    "lat": {
+      "type": "u4",
+      "attributes": {
+        "standard_name": "latitude",
+        "units": "degree_north",
+        "scale_factor": 1e-6,
+        "add_offset": -90,
+        "valid_range": [
+          0,
+          180e6
+        ],
+        "_FillValue": 4294967295,
+        "zlib": true
+      }
+    },
+    "lon": {
+      "type": "u4",
+      "attributes": {
+        "standard_name": "longitude",
+        "units": "degree_east",
+        "scale_factor": 1e-6,
+        "add_offset": -180,
+        "valid_range": [
+          0,
+          360e6
+        ],
+        "_FillValue": 4294967295,
+        "zlib": true
+      }
+    },
+    "altitude": {
+      "type": "i2",
+      "attributes": {
+        "standard_name": "altitude",
+        "units": "m",
+        "_FillValue": -1,
+        "zlib": true
+      }
+    },
+    "sensor_rotation": {
+      "type": "u2",
+      "attributes": {
+        "standard_name": "sensor_azimuth_angle",
+        "units": "degree",
+        "scale_factor": 0.1,
+        "add_offset": -360,
+        "valid_range": [
+          0,7200
+        ],
+        "_FillValue": 65535,
+        "zlib": true
+      }
+    },
+    "sensor_tilt": {
+      "type": "u2",
+      "attributes": {
+        "standard_name": "sensor_zenith_angle",
+        "units": "degree",
+        "scale_factor": 0.1,
+        "add_offset": -360,
+        "valid_range": [
+          0,7200
+        ],
+        "_FillValue": 65535,
+        "zlib": true
+      }
+    },
+    "sensor_status": {
+      "type": "u2",
+      "attributes":{
+        "standard_name": "status_flag",
+        "zlib":true
+      }
+    },
+    "heating_flag": {
+      "type": "u2",
+      "attributes":{
+        "standard_name": "status_flag",
+        "zlib":true
+      }
+    }
+  }
+}

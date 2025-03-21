@@ -1,0 +1,35 @@
+// Mapping Sensor short+serial to Instrument Serial and description
+{
+  "IR20-T1_4164": {
+    "serial": "4164",
+    "device": "Pyrgeometer IR20-T1, Hukseflux",
+    "station": "LIMMACO"
+  },
+  "IR20-T1_4165": {
+    "serial": "4165",
+    "device": "Pyrgeometer IR20-T1, Hukseflux",
+    "station": "LIMMACO"
+  },
+  "SR300-D1_45530": {
+    "serial": "45530",
+    "device": "Pyranometer SR300-D1, Hukseflux",
+    "station": "LIMMACO"
+  },
+  "SR300-D1_45531": {
+    "serial": "45531",
+    "device": "Pyranometer SR300-D1, Hukseflux",
+    "station": "LIMMACO"
+  },
+  "WS500_346.0924.813.251":{
+    "serial": "346.0924.813.251",
+    "device": "Weatherstation WS500-UMB, Lufft",
+    "station": "LIMMACO"
+  },
+  "CR1000X_63440":{
+    "serial": "63440",
+    "device": "Datalogger CR1000X, Campbell Sc.",
+    "station": "LIMMACO"
+  }
+}
+
+  
