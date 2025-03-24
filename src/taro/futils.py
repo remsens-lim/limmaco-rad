@@ -226,6 +226,10 @@ def get_cfmeta(config=None):
     gattrs = cfdict['attributes']
     # apply config
     gattrs = {k:v.format_map(config) for k,v in gattrs.items()}
+    if "contributor_name" in config:
+        gattrs["contributor_name"] = config["contributor_name"]
+    if "contributor_role" in config:
+        gattrs["contributor_role"] = config["contributor_role"]
     # get variable attributes
     d = taro.utils.get_var_attrs(cfdict)
     # split encoding attributes

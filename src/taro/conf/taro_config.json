@@ -19,8 +19,8 @@
   "campaign": "", // Campaign name
   "project": "", // Project name
   "creator_name": "", // Processing User
-  "contributor_name": "", // Names of any contributing individual
-  "contributor_role": "", // Role of any of the contributing individuals
+  "contributor_name": [], // Names of any contributing individual
+  "contributor_role": [], // Role of any of the contributing individuals
   "collection": 1, //Processing collection
   "coordinates": null, // null or [latitude (degN), longitude (degE), altitude (m)]
   // asi16 config
