@@ -166,8 +166,6 @@ def to_l1a(
 
     # add attributes to Dataset
     for k,v in vattrs.items():
-        if k not in ds.keys():
-            continue
         # iterate over suffixed variables
         for ki in [key for key in ds if key.startswith(k)]:
             ds[ki].attrs.update(v)
