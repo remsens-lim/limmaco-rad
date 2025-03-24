@@ -36,7 +36,7 @@ def _configure(config):
     return config
 
 # initialize commandline interface
-@click.version_option()
+@click.version_option(taro.__version__, package_name="limmaco-rad")
 @click.group("taro")
 def cli():
     pass
@@ -410,7 +410,7 @@ def info(ids:str, calibration:bool, serial:bool, tropos:bool, device:bool, confi
 
 
 
-@click.version_option()
+@click.version_option(taro.__version__, package_name="limmaco-rad")
 @click.group("asi16")
 def cli_asi16():
     pass
@@ -810,7 +810,7 @@ def asi16_test_config(
     image_out.show()
 
 
-@click.version_option()
+@click.version_option(taro.__version__, package_name="limmaco-rad")
 @click.group("wiser")
 def cli_wiser():
     pass

@@ -1,7 +1,7 @@
 
 from importlib.metadata import version, PackageNotFoundError
 try:
-    __version__ = version("limmaco-rad")
+    __version__ = "limmaco-rad_" + version("limmaco-rad")
 except PackageNotFoundError:
     # package is not installed
     pass
