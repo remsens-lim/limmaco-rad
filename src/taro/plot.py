@@ -92,9 +92,9 @@ class TAROQuicklooks:
         else:
             for i, id in enumerate(ids):
                 if i == 0:
-                    dsout = dsname.filter_by_attrs(troposID=id)
+                    dsout = dsname.filter_by_attrs(ID=id)
                 else:
-                    dsout = xr.merge((dsout, dsname.filter_by_attrs(troposID=id)))
+                    dsout = xr.merge((dsout, dsname.filter_by_attrs(ID=id)))
             return dsout
 
     def time_series(self, key=None, *, ax=None, ids=None, freq=None, unit=None, scale=1., add_offset=0., standard_names=None, label="", device=False, cmap=None, kwargs={}):
@@ -125,7 +125,7 @@ class TAROQuicklooks:
             if device:
                 device = dsp[var].attrs["device"].split(',')[0]
                 device = re.sub(r"\s+", "\n", device)
-                id = dsp[var].attrs["troposID"]
+                id = dsp[var].attrs["ID"]
                 varlabel = f"{label}\n{device}\n{id}"
             else:
                 varlabel = label
@@ -461,7 +461,7 @@ class TAROQuicklooks:
             if labels is None:
                 device = dsp[var].attrs["device"].split(',')[0]
                 device = re.sub(r"\s+", "\n", device)
-                id = dsp[var].attrs["troposID"]
+                id = dsp[var].attrs["ID"]
                 label = f"{device}\n{id}\n{var}"
             else:
                 label = labels[i]
