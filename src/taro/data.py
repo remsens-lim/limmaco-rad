@@ -126,7 +126,7 @@ def to_l1a(
             continue
         oldunit = colunits[key].values[0]
         newunit = vattrs[table_map[i, 0]]["units"]
-        if oldunit == "": # skip unitless variables
+        if newunit == "": # skip unitless variables
             continue
         if oldunit == "%" and newunit == "1":
             ds[key].values = ds[key].values*1e-2
