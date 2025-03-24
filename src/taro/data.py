@@ -76,7 +76,7 @@ def to_l1a(
 
     names = []
     for i, v in enumerate(names_with_sfx):
-        count = list(table_map[:i, 0]).count(name)
+        count = list(table_map[:i, 0]).count(v)
         names.append(v + f"_{count+1:d}" if count > 0 else v)
 
     # parse the data file
