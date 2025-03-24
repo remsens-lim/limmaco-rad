@@ -238,7 +238,7 @@ def to_l1b(ds_l1a, resolution, *, config=None):
     ds_l1b = ds_l1b.drop_vars(flx_vars, errors="ignore") # drop any pre-calibrated variables which share the flux variable name 
     for var in flx_vars:
         var = f"raw_{var}" # apply to raw data only
-        troposID = ds_l1b[var].attrs["troposID"]
+        troposID = ds_l1b[var].attrs["ID"]
         calib = taro.utils.parse_calibration(
             cfile=config["file_calibration"],
             troposID=troposID,
@@ -250,7 +250,7 @@ def to_l1b(ds_l1a, resolution, *, config=None):
         
         # calibration factor temperature sensitivity correction
         # select sensor temperature
-        dstemp = ds_l1b.filter_by_attrs(troposID=troposID)
+        dstemp = ds_l1b.filter_by_attrs(ID=troposID)
         tcorr_flag = False
         if len(dstemp)!=0:
             for key in dstemp:
@@ -270,7 +270,7 @@ def to_l1b(ds_l1a, resolution, *, config=None):
         # Longwave calibration
         if "longwave" in ds_l1b[var].attrs["standard_name"]:
             # select sensor temperature
-            dstemp = ds_l1b.filter_by_attrs(troposID=troposID)
+            dstemp = ds_l1b.filter_by_attrs(ID=troposID)
             for key in dstemp:
                 if key.startswith("sensor_temperature"):
                     temp_sensor = dstemp[key].values * Unit(dstemp[key].attrs['units'])
