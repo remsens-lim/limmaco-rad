@@ -21,6 +21,8 @@ def _parse_unit(unit):
     unit = str(unit)
     if unit == "%":
         return ''
+    if unit == "nan":
+        return ''
     # add ^ before numbers
     unit = re.sub(r"-?[0-9]",r"^\g<0>", unit)
     return unit
@@ -126,8 +128,6 @@ def to_l1a(
             continue
         oldunit = colunits[key].values[0]
         newunit = vattrs[table_map[i, 0]]["units"]
-        if newunit == "": # skip unitless variables
-            continue
         if oldunit == "%" and newunit == "1":
             ds[key].values = ds[key].values*1e-2
             continue

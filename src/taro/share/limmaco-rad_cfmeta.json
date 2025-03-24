@@ -283,7 +283,7 @@
         "zlib": true
       }
     },
-    "swd_raw": {
+    "raw_swd": {
       "type": "u4",
       "attributes": {
         "long_name": "surface downwelling shortwave flux, also called global horizontal irradiance (GHI)",
@@ -299,7 +299,7 @@
         "zlib": true
       }
     },
-    "swu_raw": {
+    "raw_swu": {
       "type": "u4",
       "attributes": {
         "long_name": "surface upwelling shortwave flux",
@@ -315,7 +315,7 @@
         "zlib": true
       }
     },
-    "dhi_raw": {
+    "raw_dhi": {
       "type": "u4",
       "attributes": {
         "long_name": "surface diffuse downwelling shortwave flux, also called diffuse horizontal irradiance (DHI)",
@@ -331,7 +331,7 @@
         "zlib": true
       }
     },
-    "dni_raw": {
+    "raw_dni": {
       "type": "u4",
       "attributes": {
         "long_name": "direct downwelling shortwave flux, also called direct normal irradiance (DNI)",
@@ -347,7 +347,7 @@
         "zlib": true
       }
     },
-    "lwd_raw": {
+    "raw_lwd": {
       "type": "u4",
       "attributes": {
         "long_name": "surface downwelling longwave flux",
@@ -363,7 +363,7 @@
         "zlib": true
       }
     },
-    "lwu_raw": {
+    "raw_lwu": {
       "type": "u4",
       "attributes": {
         "long_name": "surface upwelling longwave flux",
