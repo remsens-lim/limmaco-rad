@@ -648,6 +648,7 @@
     "sensor_status": {
       "type": "u2",
       "attributes":{
+        "units": "",
         "standard_name": "status_flag",
         "zlib":true
       }
@@ -655,6 +656,7 @@
     "heating_flag": {
       "type": "u2",
       "attributes":{
+        "units": "",
         "standard_name": "status_flag",
         "zlib":true
       }
