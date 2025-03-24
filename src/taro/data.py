@@ -247,6 +247,9 @@ def to_l1b(ds_l1a, resolution, *, config=None):
 
         cfac_unit = _parse_quantity(calib["calibration_factor_units"].values)
         cfac = calib["calibration_factor"].values * cfac_unit
+        # assume cfac unit in the form ( units_of_Voltage / (Wm-2) )
+        cfac = ((1./cfac).to(f"W m^-2 {ds_l1b[var].attrs['units']}^-1")).value
+        cdate = f"{pd.to_datetime(calib.time.values):%Y-%m}"
         
         # calibration factor temperature sensitivity correction
         # select sensor temperature
@@ -260,12 +263,8 @@ def to_l1b(ds_l1a, resolution, *, config=None):
             coeff_a = (calib["temperature_coeff_a"].values * _parse_quantity(calib["temperature_coeff_a_units"].values)).to("degC^-2").value
             coeff_b = (calib["temperature_coeff_b"].values * _parse_quantity(calib["temperature_coeff_b_units"].values)).to("degC^-1").value
             coeff_c = calib["temperature_coeff_c"].values
-            cfac *= coeff_a*t_sensor**2 + coeff_b*t_sensor + coeff_c
+            cfac = np.full(t_sensor.size,cfac) / (coeff_a*t_sensor**2 + coeff_b*t_sensor + coeff_c)
             tcorr_flag = True
-
-        cdate = f"{pd.to_datetime(calib.time.values):%Y-%m}"
-        # assume cfac unit in the form ( units_of_Voltage / (Wm-2) )
-        cfac = ((1./cfac).to(f"W m^-2 {ds_l1b[var].attrs['units']}^-1")).value
 
         # Longwave calibration
         if "longwave" in ds_l1b[var].attrs["standard_name"]:
