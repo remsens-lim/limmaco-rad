@@ -1,7 +1,7 @@
 {
   // TARO-CORE broadband sensor calibrations
   // [calibration_factor, calibration_factor_uncertainty, temperature_coeff_a, temperature_coeff_b, temperature_coeff_c]
-  "units": ["uV W-1 m2", "uV W-1 m2", "degC-2", "degC-1", ""],
+  "units": ["uV W-1 m2", "uV W-1 m2", "degC^-2", "degC^-1", ""],
   "2024-12-01": {
     "IR20-T1_4164": [11.55, 0.42, -15.1993e-6, 26.7575e-4, 0.9526],
     "IR20-T1_4165": [12.22, 0.45, -15.6504e-6, 27.5429e-4, 0.9512],
