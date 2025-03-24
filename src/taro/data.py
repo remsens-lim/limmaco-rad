@@ -105,6 +105,8 @@ def to_l1a(
         meta = keyfilter(lambda x: not x.startswith('calibration'), meta)
         # drop None values
         meta = valfilter(lambda x: x is not None, meta)
+        if "troposID" in meta:
+            meta["ID"] = meta.pop("troposID")
         # update netcdf attributes
         ds[name].attrs.update(meta)
 
