@@ -257,9 +257,9 @@ def to_l1b(ds_l1a, resolution, *, config=None):
                 if key.startswith("sensor_temperature"):
                     temp_sensor = dstemp[key].values * Unit(dstemp[key].attrs['units'])
             t_sensor = temp_sensor.to("degC").value
-            coeff_a = (calib["temperature_coeff_a"] * Unit(calib["temperature_coeff_a_units"])).to("degC^-2").value
-            coeff_b = (calib["temperature_coeff_b"] * Unit(calib["temperature_coeff_b_units"])).to("degC^-1").value
-            coeff_c = calib["temperature_coeff_c"]
+            coeff_a = (calib["temperature_coeff_a"].values * _parse_quantity(calib["temperature_coeff_a_units"].values)).to("degC^-2").value
+            coeff_b = (calib["temperature_coeff_b"].values * _parse_quantity(calib["temperature_coeff_b_units"].values)).to("degC^-1").value
+            coeff_c = calib["temperature_coeff_c"].values
             cfac *= coeff_a*t_sensor**2 + coeff_b*t_sensor + coeff_c
             tcorr_flag = True
 
