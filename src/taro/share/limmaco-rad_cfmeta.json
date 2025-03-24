@@ -650,6 +650,7 @@
       "attributes":{
         "units": "",
         "standard_name": "status_flag",
+        "_FillValue": 65535,
         "zlib":true
       }
     },
@@ -658,6 +659,7 @@
       "attributes":{
         "units": "",
         "standard_name": "status_flag",
+        "_FillValue": 65535,
         "zlib":true
       }
     }
