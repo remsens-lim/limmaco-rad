@@ -66,8 +66,8 @@
       ["heating_flag","",""]
     ],
     "CR1000Status": [
-      ["time", ""],
-      ["record", ""],
+      ["time", "", ""],
+      ["record", "", ""],
       ["battery_voltage","",""],
       ["sensor_temperature","", ""]
     ]
