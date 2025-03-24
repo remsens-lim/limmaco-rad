@@ -224,7 +224,7 @@ def to_l1b(ds_l1a, resolution, *, config=None):
 
     # x. correct dark current
     for var in flx_vars:
-        var += "_raw" # apply to raw data only
+        var = f"raw_{var}" # apply to raw data only
         if "longwave" in ds_l1b[var].attrs["standard_name"]:
             continue
         dark = np.nanmedian(ds_l1b[var].values[szen>100])
@@ -237,7 +237,7 @@ def to_l1b(ds_l1a, resolution, *, config=None):
     # 1. calibrate flux vars
     ds_l1b = ds_l1b.drop_vars(flx_vars, errors="ignore") # drop any pre-calibrated variables which share the flux variable name 
     for var in flx_vars:
-        var += "_raw" # apply to raw data only
+        var = f"raw_{var}" # apply to raw data only
         troposID = ds_l1b[var].attrs["troposID"]
         calib = taro.utils.parse_calibration(
             cfile=config["file_calibration"],
@@ -317,7 +317,7 @@ def to_l1b(ds_l1a, resolution, *, config=None):
         vencode = assoc_in(vencode, [var,'valid_range'],list(valid_range))
         vencode = assoc_in(vencode, [var, 'scale_factor'], scale_factor)
         vencode = assoc_in(vencode, [var, 'add_offset'], add_offset)
-    ds_l1b = ds_l1b.rename_vars({v+'_raw':v for v in flx_vars}) # drop "_raw" suffix for calibrated variables
+    ds_l1b = ds_l1b.rename_vars({"raw_"+v:v for v in flx_vars}) # drop "_raw" suffix for calibrated variables
 
     # 2. resample dataset
     methods = ['mean'] + config["l1b_resample_stats"]
