@@ -172,7 +172,7 @@ def parse_calibration(cfile,troposID, cdate=None):
     isort = np.argsort(cdates)
     skeys = np.array(date_keys)[isort]
 
-    ctimes, cfacs, cerrs = [], [], []
+    ctimes, cfacs, cerrs, tc_a, tc_b, tc_c = [], [], [], [], [], []
     # lookup calibration factors
     for i, key in enumerate(skeys):
         if troposID in calib[key]:
@@ -182,6 +182,19 @@ def parse_calibration(cfile,troposID, cdate=None):
                 cerrs.append(np.nan)
             else:
                 cerrs.append(calib[key][troposID][1])
+            if calib[key][troposID][2] is None:
+                tc_a.append(0)
+            else:
+                tc_a.append(calib[key][troposID][2])
+            if calib[key][troposID][3] is None:
+                tc_b.append(0)
+            else:
+                tc_b.append(calib[key][troposID][3])
+            if calib[key][troposID][4] is None:
+                tc_c.append(1)
+            else:
+                tc_c.append(calib[key][troposID][4])
+                
     if len(ctimes) == 0:
         return None
 
@@ -189,17 +202,19 @@ def parse_calibration(cfile,troposID, cdate=None):
         {
             "calibration_factor": ("time", np.array(cfacs)),
             "calibration_error": ("time", np.array(cerrs)),
+            "temperature_coeff_a": ("time", np.array(tc_a)),
+            "temperature_coeff_b": ("time", np.array(tc_b)),
+            "temperature_coeff_c": ("time", np.array(tc_c)),
             "calibration_factor_units": calib['units'][0],
-            "calibration_error_units": calib['units'][1]
+            "calibration_error_units": calib['units'][1],
+            "temperature_coeff_a_units": calib['units'][2],
+            "temperature_coeff_b_units": calib['units'][3],
+            "temperature_coeff_c_units": calib['units'][4],
         },
         coords={
             "time": ("time",np.array(ctimes))
         }
     )
-
-    # add temperature correction coefficients
-    if ("temp_correction" in calib) and (troposID in calib["temp_correction"]):
-        ds["temperature_correction_coef"] = calib["temp_correction"][troposID]
 
     if cdate is not None:
         ds = ds.sel(time=cdate, method='nearest')

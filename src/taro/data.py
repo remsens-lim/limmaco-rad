@@ -245,6 +245,22 @@ def to_l1b(ds_l1a, resolution, *, config=None):
 
         cfac_unit = _parse_quantity(calib["calibration_factor_units"].values)
         cfac = calib["calibration_factor"].values * cfac_unit
+        
+        # calibration factor temperature sensitivity correction
+        # select sensor temperature
+        dstemp = ds_l1b.filter_by_attrs(troposID=troposID)
+        tcorr_flag = False
+        if len(dstemp)!=0:
+            for key in dstemp:
+                if key.startswith("sensor_temperature"):
+                    temp_sensor = dstemp[key].values * Unit(dstemp[key].attrs['units'])
+            t_sensor = temp_sensor.to("degC").value
+            coeff_a = (calib["temperature_coeff_a"] * _parse_quantity(calib["temperature_coeff_a_units"])).to("degC^-2").value
+            coeff_b = (calib["temperature_coeff_b"] * _parse_quantity(calib["temperature_coeff_b_units"])).to("degC^-1").value
+            coeff_c = calib["temperature_coeff_c"]
+            cfac *= coeff_a*t_sensor**2 + coeff_b*t_sensor + coeff_c
+            tcorr_flag = True
+
         cdate = f"{pd.to_datetime(calib.time.values):%Y-%m}"
         # assume cfac unit in the form ( units_of_Voltage / (Wm-2) )
         cfac = ((1./cfac).to(f"W m^-2 {ds_l1b[var].attrs['units']}^-1")).value
@@ -258,22 +274,31 @@ def to_l1b(ds_l1a, resolution, *, config=None):
                     temp_sensor = dstemp[key].values * Unit(dstemp[key].attrs['units'])
             # measured Voltage
             V0 = ds_l1b[var].values
-            # temperature correction
-            if "temperature_correction_coef" in calib:
-                a, b, c = calib["temperature_correction_coef"].values
-                T = (temp_sensor.to("degC")).value
-                V0 *= (1. + a*(T**2) + b*T + c)
             # calibrate to W m-2
             ds_l1b[var].values = V0 * cfac + 5.670367e-8 * ((temp_sensor.to("K")).value**4)
-            ds_l1b[var].attrs.update({
-                "calibration_function": "flux (W m-2) = flux (V) * calibration_factor (W m-2 V-1) + 5.670367e-8 * (sensor_temperature (K))**4",
-            })
+            if tcorr_flag:
+                ds_l1b[var].attrs.update({
+                    "calibration_function": "flux (W m-2) = flux (V) * calibration_factor/temperatur_correction (W m-2 V-1) + 5.670367e-8 * (sensor_temperature (K))**4",
+                    "temperatur_correction": "temperatur_correction = coeff[0] * sensor_temperature(degC)**2 + coeff[1] * sensor_temperature(degC) + coeff[2]",
+                    "temperatur_correction_coeff": [coeff_a, coeff_b, coeff_c]
+                })
+            else:
+                ds_l1b[var].attrs.update({
+                    "calibration_function": "flux (W m-2) = flux (V) * calibration_factor (W m-2 V-1) + 5.670367e-8 * (sensor_temperature (K))**4",
+                })
         else:
             ds_l1b[var].values = ds_l1b[var].values*cfac
             ds_l1b[var].values[ds_l1b[var].values < 0] = 0.
-            ds_l1b[var].attrs.update({
-                "calibration_function": "flux (W m-2) = flux (V) * calibration_factor (W m-2 V-1)",
-            })
+            if tcorr_flag:
+                ds_l1b[var].attrs.update({
+                    "calibration_function": "flux (W m-2) = flux (V) * calibration_factor/temperatur_correction (W m-2 V-1)",
+                    "temperatur_correction": "temperatur_correction = coeff[0] * sensor_temperature(degC)**2 + coeff[1] * sensor_temperature(degC) + coeff[2]",
+                    "temperatur_correction_coeff": [coeff_a, coeff_b, coeff_c]
+                })
+            else:
+                ds_l1b[var].attrs.update({
+                    "calibration_function": "flux (W m-2) = flux (V) * calibration_factor (W m-2 V-1)",
+                })
         # add new attributes and encoding to calibrated flux vars
         ds_l1b[var].attrs.update({
             "units": "W m-2",
