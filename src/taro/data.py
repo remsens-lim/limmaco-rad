@@ -334,38 +334,15 @@ def to_l1b(ds_l1a, resolution, *, config=None):
                 "standard_name": f"{method}_"+ds_l1b[f"{var}_{method}"].attrs["standard_name"]
             })
 
-    # # 3. add coordinats if available in config
-    # if config["coordinates"] is not None:
-    #     lat, lon, alt = config["coordinates"]
-    #     if lat is not None:
-    #         ds_l1b["lat"] = lat
-    #     if lon is not None:
-    #         ds_l1b["lon"] = lon
-    #     if alt is not None:
-    #         ds_l1b["altitude"] = alt
-    #
-    # # 4. add sun position
-    # if ("lat" in ds_l1b) and ("lon" in ds_l1b):
-    #     szen, sazi = sp.sun_angles(
-    #         time=ds_l1b.time.values,
-    #         lat=ds_l1b.lat.values,
-    #         lon=ds_l1b.lon.values
-    #     )
-    #     szen = szen.squeeze()
-    #     sazi = sazi.squeeze()
-    #
-    #     esd = np.mean(sp.earth_sun_distance(ds_l1b.time.values))
-    #
-    #     ds_l1b = ds_l1b.assign(
-    #         {
-    #             "szen": (("time"), szen),
-    #             "sazi": (("time"), sazi),
-    #             "esd":  esd
-    #         }
-    #     )
-    #     # update attributes and encoding
-    #     for key in ['szen', 'sazi', 'esd']:
-    #         ds_l1b[key].attrs.update(vattrs[key])
+    # Correct Wind direction with sensor compass
+    if "compass" in ds_l1b:
+        for key in ds_l1b:
+            if key.startswith("wind_direction") and not (key.endswith("min") or key.endswith("std")):
+                tvals = ds_l1b[key].values
+                tvals -= ds_l1b["compass"].values
+                tvals[tvals<0] += 360.
+                ds_l1b[key].values = tvals
+                ds_l1b[key].attrs.update({"comment": "Corrected with sensor compass."})
 
     # 5. add BSRN quality flags
     ds_l1b = taro.qcrad.quality_control(ds_l1b)
