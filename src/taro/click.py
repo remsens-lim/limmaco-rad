@@ -12,6 +12,7 @@ import datetime as dt
 import importlib.resources
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import windrose
 
 import taro
 import taro.utils
@@ -242,7 +243,13 @@ def ql_data(input_files, output_path, skip_exists, config,dpi):
                 continue
 
             ds_l1b = xr.load_dataset(fn)
-            fig, axs = plt.subplots(2, 1, figsize=(8, 8))
+            fig = plt.figure(figsize=(8, 12))
+            axs = [
+                fig.add_subplot(311),
+                fig.add_subplot(312),
+                fig.add_subplot(313,axes_class=windrose.WindAxes)
+            ]
+
             plots = ds_l1b.quicklooks.flux(ax=axs[0])
             axs[0].set_ylim([-10, 1310])
             pl, (ax, pax, rax) = ds_l1b.quicklooks.meteorology(
@@ -254,7 +261,7 @@ def ql_data(input_files, output_path, skip_exists, config,dpi):
             )
             rax.legend(handles=pl, loc='lower right')
 
-
+            ds_l1b.quicklooks.windrose(ax=axs[2])
 
             os.makedirs(os.path.dirname(outfile), exist_ok=True)
             fig.savefig(outfile, dpi=dpi, bbox_inches='tight')
@@ -297,8 +304,8 @@ def ql_quality(input_files: list, output_path: str, skip_exists:bool, config: di
                                     gridspec_kw={"height_ratios": [5, 2, 1, 5]})
 
             pl_status, (ax_s1, ax_s2) = ds_l1b.quicklooks.status(ax=axs[0])
-            ds_l1b.quicklooks.quality_range_dhi2ghi(ax=axs[1], ratio=True, kwargs={'alpha': 0.5})
-            ds_l1b.quicklooks.quality_range_shading(ax=axs[1], ratio=True, kwargs={'alpha': 0.5, 'hatch': '//'})
+            #ds_l1b.quicklooks.quality_range_dhi2ghi(ax=axs[1], ratio=True, kwargs={'alpha': 0.5})
+            #ds_l1b.quicklooks.quality_range_shading(ax=axs[1], ratio=True, kwargs={'alpha': 0.5, 'hatch': '//'})
             ds_l1b.quicklooks.quality_range_lwd2temp(ax=axs[1], ratio=True, kwargs={'alpha': 0.5})
 
             axs[1].legend(bbox_to_anchor=(1, 1))

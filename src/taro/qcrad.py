@@ -34,6 +34,8 @@ class SNAMES:
     rh = "relative_humidity"
     qc = "quality_flag"
     freq = "frequency"
+    wd = "wind_from_direction"
+    ws = "wind_speed"
 
 def quality_control(ds, lat=None, lon=None):
     def _init_qc(ds, var):

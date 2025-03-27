@@ -35,6 +35,8 @@ class CMAPS:
     twb = plt.cm.Reds
     tsens = plt.cm.Reds
     freq = plt.cm.Greys
+    wd = plt.cm.Greys
+    ws = plt.cm.Greys
 
 class LABELS:
     ghi = 'GHI'
@@ -51,6 +53,8 @@ class LABELS:
     twb = 'wet bulb temperature'
     tsens = 'sensor temperature'
     freq = 'ventilator frequency'
+    wd = 'wind from direction'
+    ws = 'wind speed'
 
 @xr.register_dataset_accessor("quicklooks")
 class TAROQuicklooks:
@@ -147,6 +151,47 @@ class TAROQuicklooks:
             plots.append(pl)
 
         return plots
+    
+    def windrose(self, ax=None, ids=None, sfx='avg'):
+        if ax is None:
+            ax = windrose.WindAxes.from_ax()
+
+        standard_names = [getattr(SNAMES, "ws"), getattr(SNAMES, "wd")]
+        dsp = self._filter_device(ids=ids, standard_names=standard_names)
+        for key in dsp:
+            if key.endswith(sfx):
+                if dsp[key].attrs["standard_name"] == getattr(SNAMES, "ws"):
+                    ws = dsp[key].dropna("time").values
+                else:
+                    wd = dsp[key].dropna("time").values
+
+        bins = np.histogram_bin_edges(ws,bins="auto")
+        bins = np.append(bins,np.max(ws)+2)
+        ax, params = ax.pdf(ws, bins=bins, bar_color='#1f78b4',plot_color='#b2df8a')
+        ax.set_ylabel("wind speed PDF")
+        ax.set_xlabel("wind speed (m s-1)")
+
+        # Inset axe with size relative to main axe
+        wrax = ax.inset_axes(
+            bounds=(0.6,0.2,0.5,0.7),
+            axes_class=windrose.WindroseAxes,
+        )
+
+        wrax.bar(
+            wd, ws,
+            normed=True,
+            opening=0.8,
+            cmap=plt.cm.plasma,
+            edgecolor="white"
+        )
+        wrax.patch.set_facecolor('#f7f7f7')
+        wrax.patch.set_alpha(0.7)
+        wrax.set_legend(title="wind speed (m s-1)",bbox_to_anchor=(0.55,-0.55))
+        wrax.tick_params(labelleft=False)
+
+        return
+
+
 
     def flux(self, ax=None, ids=None, device=False, legend=True, kwargs={}):
         if ax is None:
