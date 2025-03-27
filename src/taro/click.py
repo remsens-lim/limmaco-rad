@@ -248,11 +248,11 @@ def ql_data(input_files, output_path, skip_exists, config,dpi):
             pl, (ax, pax, rax) = ds_l1b.quicklooks.meteorology(
                 ax=axs[1],
                 legend=False,
-                ylim={"tair": [15, 40],
+                ylim={"tair": [-10, 40],
                       "pair": [990, 1040],
                       "rh": None}
             )
-            ax.legend(handles=pl, loc='lower right')
+            rax.legend(handles=pl, loc='lower right')
 
 
 

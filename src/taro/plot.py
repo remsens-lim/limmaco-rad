@@ -4,13 +4,16 @@ import numpy as np
 import pandas as pd
 from unitpy import Unit
 import trosat.sunpos as sp
+import windrose
 
 # import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import matplotlib.colors as mcolors
+from matplotlib.colors import ListedColormap
 import matplotlib.dates as mdates
 import matplotlib.patheffects as pe
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
 
 from taro.qcrad import SNAMES, CONSTANTS
@@ -19,9 +22,12 @@ import taro.futils
 
 class CMAPS:
     ghi = plt.cm.Blues
+    swd = plt.cm.Blues
+    swu = ListedColormap(plt.cm.Blues(np.arange(0,0.5,0.01))) #lighter blues
     dni = plt.cm.RdPu
     dhi = plt.cm.Greens
-    lwd = plt.cm.Greys
+    lwd = plt.cm.Greens
+    lwu = ListedColormap(plt.cm.Greens(np.arange(0,0.5,0.01))) #lighter greens
     tair = plt.cm.Reds
     pair = plt.cm.Blues
     rh = plt.cm.Greys
@@ -35,6 +41,9 @@ class LABELS:
     dhi = 'DHI'
     dni = 'DNI'
     lwd = 'LWD'
+    lwu = 'LWU'
+    swd = 'SWD'
+    swu = 'SWU'
     tair = 'air temperature'
     pair = 'air pressure'
     rh = 'relative humidity'
@@ -145,8 +154,18 @@ class TAROQuicklooks:
 
         plots = []
 
-        pl = self.time_series("ghi", ids=ids, device=device, ax=ax, kwargs=kwargs)
+        pl = self.time_series("swd", ids=ids, device=device, ax=ax, kwargs=kwargs)
         plots += pl
+
+        pl = self.time_series("swu", ids=ids, device=device, ax=ax, kwargs=kwargs)
+        plots += pl
+
+        pl = self.time_series("lwd", ids=ids, device=device, ax=ax, kwargs=kwargs)
+        plots += pl
+
+        pl = self.time_series("lwu", ids=ids, device=device, ax=ax, kwargs=kwargs)
+        plots += pl
+
 
         pl = self.time_series("dhi", ids=ids, device=device, ax=ax, kwargs=kwargs)
         plots += pl
@@ -158,8 +177,6 @@ class TAROQuicklooks:
             pl, = ax.plot(self.time, self.ds[var]*self.mu0, label=label, **kwargs)
             plots.append(pl)
 
-        pl = self.time_series("lwd", ids=ids, device=device, ax=ax, kwargs=kwargs)
-        plots += pl
 
         ax.grid(True)
         ax.xaxis.set_major_formatter(mdates.ConciseDateFormatter(ax.xaxis.get_major_locator()))
