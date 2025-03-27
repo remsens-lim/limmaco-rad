@@ -29,7 +29,8 @@ dependencies = [
     "parse>=1.20.0",
     "unitpy",
     "scipy",
-    "matplotlib"
+    "matplotlib",
+    "windrose"
 ]
 
 [project.optional-dependencies]
