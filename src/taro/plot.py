@@ -37,6 +37,8 @@ class CMAPS:
     freq = plt.cm.Greys
     wd = plt.cm.Greys
     ws = plt.cm.Greys
+    rotation = plt.cm.Reds
+    tilt = plt.cm.Blues
 
 class LABELS:
     ghi = 'GHI'
@@ -55,6 +57,8 @@ class LABELS:
     freq = 'ventilator frequency'
     wd = 'wind from direction'
     ws = 'wind speed'
+    rotation = "sensor azimuth angle"
+    tilt = "sensor zenith angle"
 
 @xr.register_dataset_accessor("quicklooks")
 class TAROQuicklooks:
@@ -110,7 +114,7 @@ class TAROQuicklooks:
                     dsout = xr.merge((dsout, dsname.filter_by_attrs(ID=id)))
             return dsout
 
-    def time_series(self, key=None, *, ax=None, ids=None, freq=None, unit=None, scale=1., add_offset=0., standard_names=None, label="", device=False, cmap=None, kwargs={}):
+    def time_series(self, key=None, *, ax=None,sfx=None,delta=False,exsfx=None, ids=None, freq=None, unit=None, scale=1., add_offset=0., standard_names=None, label="", device=False, cmap=None, kwargs={}):
         if ax is None:
             ax = plt.gca()
 
@@ -119,6 +123,10 @@ class TAROQuicklooks:
         else:
             standard_names = [getattr(SNAMES, key)]
             dsp = self._filter_device(ids=ids, standard_names=standard_names)
+            if sfx is not None: # select variable with this suffix only
+                dsp = dsp.drop_vars([var for var in dsp if not var.endswith(sfx)])
+            if exsfx is not None: # exclude varibales with this suffix
+                dsp = dsp.drop_vars([var for var in dsp if var.endswith(exsfx)])
             cmap = getattr(CMAPS, key)
             label = getattr(LABELS, key)
 
@@ -139,12 +147,15 @@ class TAROQuicklooks:
                 device = dsp[var].attrs["device"].split(',')[0]
                 device = re.sub(r"\s+", "\n", device)
                 id = dsp[var].attrs["ID"]
-                varlabel = f"{label}\n{device}\n{id}"
+                varlabel = f"{label}, {id}"
+                #varlabel = id
             else:
                 varlabel = label
             values = dsp[var].values if unit is None else (dsp[var].values*Unit(dsp[var].attrs['units'])).to(unit).value
             values *= scale
             values += add_offset
+            if delta:
+                values = values - np.nanmean(values)
             pl, = ax.plot(dsp.time.values, values, label=varlabel, **kwargs)
             ax.set_xlim((dsp.time.values[0].astype("datetime64[D]"),
                          dsp.time.values[0].astype("datetime64[D]") + np.timedelta64(23 * 60 + 59, 'm')))
@@ -338,7 +349,7 @@ class TAROQuicklooks:
             ax = plt.gca()
         plots = []
 
-        pax = ax.twinx()
+        #pax = ax.twinx()
 
         pl = self.time_series("tsens", ax=ax, ids=ids, device=True,
                               unit='degC',
@@ -346,13 +357,66 @@ class TAROQuicklooks:
                               kwargs={'marker': '.', **kwargs})
         tcolor = pl[0].get_color()
         plots += pl
-        pl = self.time_series("freq", ax=pax, ids=ids, device=True,
-                              unit='Hz',
+        #pl = self.time_series("freq", ax=pax, ids=ids, device=True,
+        #                      unit='Hz',
+        #                      freq='15min',
+        #                      kwargs={'ls': '--', **kwargs})
+        #pcolor = pl[0].get_color()
+        #plots += pl
+
+
+        # set axis limits and ticks for homogenised grid
+        self._set_axis_lim(ax, nticks=6, ylims=ax.get_ylim(), base=10, padding=5)
+        #self._set_axis_lim(pax, nticks=6, ylims=pax.get_ylim(), base=10, padding=5)
+
+        ax.grid(True)
+
+        ax.yaxis.set_tick_params(colors=tcolor)
+        ax.yaxis.set_label_coords(0.005, 0.005)
+        ax.set_yticklabels(
+            [f'\n{l.get_text()}' for l in ax.get_yticklabels()]
+        )
+
+        #pax.yaxis.set_label_coords(0.005, 0.005)
+        #pax.yaxis.set_tick_params(left=True, right=False,
+        #                          labelleft=True, labelright=False,
+        #                          colors=pcolor)
+        #pax.set_yticklabels(
+        #    [f'{l.get_text()}\n' for l in pax.get_yticklabels()]
+        #)
+
+
+        ax.xaxis.set_major_formatter(mdates.ConciseDateFormatter(ax.xaxis.get_major_locator()))
+        ax.set_ylabel("\ntemperature (degC)",ha='left',va='bottom',color=tcolor,rotation='horizontal')
+        #pax.set_ylabel("frequency (Hz)\n",ha='left',va='bottom',color=pcolor,rotation='horizontal')
+        ax.set_xlabel("time (UTC)")
+        ax.legend(
+            handles=plots,
+            bbox_to_anchor=(1, 1),
+            loc='upper left',
+            borderaxespad=0.
+        )
+
+        return plots, ax #[ax, pax]
+    
+    def sensor_alignment(self, ax=None, sfx=None,exsfx='std', ids=None, kwargs={}):
+        if ax is None:
+            ax = plt.gca()
+        plots = []
+
+        pax = ax.twinx()
+        pl = self.time_series("rotation",sfx=sfx,exsfx=exsfx,delta=True, ax=ax, ids=ids, device=True,
+                              unit='deg',
+                              freq='15min',
+                              kwargs={'marker': '.', **kwargs})
+        tcolor = pl[0].get_color()
+        plots += pl
+        pl = self.time_series("tilt",sfx=sfx, exsfx=exsfx,delta=True, ax=pax, ids=ids, device=True,
+                              unit='deg',
                               freq='15min',
                               kwargs={'ls': '--', **kwargs})
         pcolor = pl[0].get_color()
         plots += pl
-
 
         # set axis limits and ticks for homogenised grid
         self._set_axis_lim(ax, nticks=6, ylims=ax.get_ylim(), base=10, padding=5)
@@ -374,10 +438,9 @@ class TAROQuicklooks:
             [f'{l.get_text()}\n' for l in pax.get_yticklabels()]
         )
 
-
         ax.xaxis.set_major_formatter(mdates.ConciseDateFormatter(ax.xaxis.get_major_locator()))
-        ax.set_ylabel("\ntemperature (degC)",ha='left',va='bottom',color=tcolor,rotation='horizontal')
-        pax.set_ylabel("frequency (Hz)\n",ha='left',va='bottom',color=pcolor,rotation='horizontal')
+        ax.set_ylabel("\n"+r"$\Delta$ azimuth angle $\phi$ ($\phi-\overline{\phi}$, deg)",ha='left',va='bottom',color=tcolor,rotation='horizontal')
+        pax.set_ylabel(r"$\Delta$ zenith angle $\Theta$ ($\Theta-\overline{\Theta}$, deg)"+"\n",ha='left',va='bottom',color=pcolor,rotation='horizontal')
         ax.set_xlabel("time (UTC)")
         ax.legend(
             handles=plots,
@@ -387,6 +450,8 @@ class TAROQuicklooks:
         )
 
         return plots, [ax, pax]
+
+
 
     def quality_range_shading(self, ax=None, ids=None, ratio=False, kwargs={}):
         kwargs_default = {
@@ -574,6 +639,65 @@ class TAROQuicklooks:
         ax.xaxis.set_major_formatter(mdates.ConciseDateFormatter(ax.xaxis.get_major_locator()))
         return pl
     
+    def  status_flags(self, ax=None,ids=None, freq='15min', lcolor='grey', cmap=None, fontsize=9, labels=None):
+        if ax is None:
+            ax = plt.gca()
+
+        if cmap is None:
+            cmap = mcolors.ListedColormap(["#f7f7f7", "#f1a340"])
+
+        dsp = self._filter_device(standard_names=[SNAMES.status_flag], ids=ids)
+        N = len(list(dsp.keys()))
+
+        for i, var in enumerate(dsp):
+            if labels is None:
+                id = dsp[var].attrs["ID"]
+                label = f"{var}, {id}"
+            else:
+                label = labels[i]
+            ax.annotate(
+                label,
+                (1.01, 0.5 / N + float(i) / N),
+                xycoords="axes fraction",
+                #rotation='vertical',
+                va='center', ha='left',
+                fontsize=fontsize
+            )
+            if i != 0:
+                ax.axhline(i - 0.5, color=lcolor, lw=2)
+
+            qcflag = dsp[var].values
+            if var.endswith("_2"):
+                qcflag -= 1
+                qcflag[qcflag<0] = 0
+            qcflag[np.isnan(qcflag)] = 0
+            qcflag = qcflag.astype(bool)
+            
+            
+            if i == 0:
+                qcflags = qcflag.copy()[:,None]
+            else:
+                qcflags = np.hstack((qcflags, qcflag[:,None]))
+            print(qcflag.shape,qcflags.shape)
+
+        dsqc = xr.DataArray(
+            qcflags,
+            dims=('time', 'N'),
+            coords={'time': ('time', dsp.time.values)}
+        )
+        dsqc = dsqc.resample(time=freq).max(skipna=True)
+
+        pl = ax.pcolormesh(dsqc.time, dsqc.N, dsqc.T,
+                           cmap=cmap,
+                           edgecolors=lcolor, lw=0.5,
+                           rasterized=True, snap=True)
+
+        ax.set_yticks(np.arange(1, len(list(dsp.keys()))) - 0.5, [])
+        ax.yaxis.set_tick_params(length=40, width=2, color=lcolor, right=True)
+        ax.xaxis.set_major_formatter(mdates.ConciseDateFormatter(ax.xaxis.get_major_locator()))
+        return pl
+
+
     def solar_at_night(self, ax=None,kwargs={}):
         kwargs_default = {
             'color': '#f0f0f0',
@@ -588,7 +712,9 @@ class TAROQuicklooks:
         snames = [
             SNAMES.dhi,
             SNAMES.ghi,
-            SNAMES.dni
+            SNAMES.dni,
+            SNAMES.swd,
+            SNAMES.swu
         ]
 
         dsp = self._filter_device(standard_names=snames)
@@ -598,8 +724,12 @@ class TAROQuicklooks:
 
         for var in dsp:
             F = dsp[var] + dsp[var].attrs["dark_offset"]*1e6/dsp[var].attrs["calibration_factor"]
-            pl = ax.plot(dsp.time,F,label=var)
+            id = dsp[var].attrs["ID"]
+            varlabel = f"{var}, {id}"
+            pl = ax.plot(dsp.time,F,label=varlabel)
         ax.legend()
+        ax.set_ylabel("shortwave irradiance at night (W m-2)", ha='left', va='top',rotation='horizontal')
+
         ax.grid(True)
         return pl
 

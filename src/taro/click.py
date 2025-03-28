@@ -301,20 +301,21 @@ def ql_quality(input_files: list, output_path: str, skip_exists:bool, config: di
 
             ds_l1b = xr.load_dataset(fn)
             fig, axs = plt.subplots(4, 1, figsize=(10, 12), constrained_layout=True,
-                                    gridspec_kw={"height_ratios": [5, 2, 1, 5]})
+                                    gridspec_kw={"height_ratios": [2, 1, 1, 2]})
 
-            pl_status, (ax_s1, ax_s2) = ds_l1b.quicklooks.status(ax=axs[0])
+            pl_status, _ = ds_l1b.quicklooks.status(ax=axs[0])
+            pl_align, _ = ds_l1b.quicklooks.sensor_alignment(ax=axs[1])
             #ds_l1b.quicklooks.quality_range_dhi2ghi(ax=axs[1], ratio=True, kwargs={'alpha': 0.5})
             #ds_l1b.quicklooks.quality_range_shading(ax=axs[1], ratio=True, kwargs={'alpha': 0.5, 'hatch': '//'})
-            ds_l1b.quicklooks.quality_range_lwd2temp(ax=axs[1], ratio=True, kwargs={'alpha': 0.5})
+            #ds_l1b.quicklooks.quality_range_lwd2temp(ax=axs[1], ratio=True, kwargs={'alpha': 0.5})
 
-            axs[1].legend(bbox_to_anchor=(1, 1))
-            axs[1].set_ylim([0.2, 1.6])
+            #axs[1].legend(bbox_to_anchor=(1, 1))
+            #axs[1].set_ylim([0.2, 1.6])
 
             ds_l1b.quicklooks.solar_at_night(ax=axs[2])
             axs[2].legend(bbox_to_anchor=(1, 1))
 
-            pl_flags = ds_l1b.quicklooks.quality_flags(ax=axs[3], freq='15min')
+            pl_flags = ds_l1b.quicklooks.status_flags(ax=axs[3], freq='15min')
 
             os.makedirs(os.path.dirname(outfile), exist_ok=True)
             fig.savefig(outfile, dpi=dpi, bbox_inches='tight')

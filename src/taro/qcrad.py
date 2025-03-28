@@ -36,6 +36,9 @@ class SNAMES:
     freq = "frequency"
     wd = "wind_from_direction"
     ws = "wind_speed"
+    rotation = "sensor_azimuth_angle"
+    tilt = "sensor_zenith_angle"
+    status_flag = "status_flag"
 
 def quality_control(ds, lat=None, lon=None):
     def _init_qc(ds, var):
