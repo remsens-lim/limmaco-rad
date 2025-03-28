@@ -260,6 +260,7 @@ def ql_data(input_files, output_path, skip_exists, config,dpi):
                       "rh": None}
             )
             rax.legend(handles=pl, loc='lower right')
+            ds_l1b.quicklooks.wind_barbs(ax=ax,y=35)
 
             ds_l1b.quicklooks.windrose(ax=axs[2])
 

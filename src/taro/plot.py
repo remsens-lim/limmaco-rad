@@ -17,6 +17,7 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
 
 from taro.qcrad import SNAMES, CONSTANTS
+import taro.data
 import taro.utils
 import taro.futils
 
@@ -201,7 +202,24 @@ class TAROQuicklooks:
         wrax.tick_params(labelleft=False)
 
         return
+    
+    def wind_barbs(self,y=0,res='30min',ax=None, ids=None, sfx="avg"):
+        if ax is None:
+            ax = plt.gca()
 
+        standard_names = [getattr(SNAMES, "ws"), getattr(SNAMES, "wd")]
+        dsp = self._filter_device(ids=ids, standard_names=standard_names)
+        dsp = dsp.resample(time=res).mean("time",skipna=True).fillna(0)
+        for key in dsp:
+            if key.endswith(sfx):
+                if dsp[key].attrs["standard_name"] == getattr(SNAMES, "ws"):
+                    ws = (dsp[key].values * taro.data._parse_quantity(dsp[key].attrs["units"])).to("m h^-1").value / 1852. # to knots
+                else:
+                    wd = dsp[key].values + 180. # wind to direction
+
+        u,v = ws*np.sin(np.deg2rad(wd)), ws*np.cos(np.deg2rad(wd))
+        pl = ax.barbs(dsp.time,y*np.ones(dsp.time.size), u,v,pivot='middle')
+        return pl
 
 
     def flux(self, ax=None, ids=None, device=False, legend=True, kwargs={}):
