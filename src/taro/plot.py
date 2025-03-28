@@ -678,7 +678,6 @@ class TAROQuicklooks:
                 qcflags = qcflag.copy()[:,None]
             else:
                 qcflags = np.hstack((qcflags, qcflag[:,None]))
-            print(qcflag.shape,qcflags.shape)
 
         dsqc = xr.DataArray(
             qcflags,
