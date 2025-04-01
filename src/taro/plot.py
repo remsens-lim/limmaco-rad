@@ -164,18 +164,21 @@ class TAROQuicklooks:
 
         return plots
     
-    def windrose(self, ax=None, ids=None, sfx='avg'):
+    def windrose(self, ax=None, ids=None, sfx={"ws":"max", "wd":"avg"}):
         if ax is None:
             ax = windrose.WindAxes.from_ax()
 
-        standard_names = [getattr(SNAMES, "ws"), getattr(SNAMES, "wd")]
+        standard_names = [getattr(SNAMES, "ws")]
         dsp = self._filter_device(ids=ids, standard_names=standard_names)
         for key in dsp:
-            if key.endswith(sfx):
-                if dsp[key].attrs["standard_name"] == getattr(SNAMES, "ws"):
-                    ws = dsp[key].dropna("time").values
-                else:
-                    wd = dsp[key].dropna("time").values
+            if key.endswith(sfx["ws"]):
+                ws = dsp[key].dropna("time").values
+
+        standard_names = [getattr(SNAMES, "wd")]
+        dsp = self._filter_device(ids=ids, standard_names=standard_names)
+        for key in dsp:
+            if key.endswith(sfx["wd"]):
+                wd = dsp[key].dropna("time").values
 
         bins = np.histogram_bin_edges(ws,bins="auto")
         bins = np.append(bins,np.max(ws)+2)
@@ -203,19 +206,23 @@ class TAROQuicklooks:
 
         return
     
-    def wind_barbs(self,y=0,res='30min',ax=None, ids=None, sfx="avg"):
+    def wind_barbs(self,y=0,res='30min',ax=None, ids=None, sfx={"ws":"max", "wd":"avg"}):
         if ax is None:
             ax = plt.gca()
 
-        standard_names = [getattr(SNAMES, "ws"), getattr(SNAMES, "wd")]
+        standard_names = [getattr(SNAMES, "ws")]
         dsp = self._filter_device(ids=ids, standard_names=standard_names)
         dsp = dsp.resample(time=res).mean("time",skipna=True).fillna(0)
         for key in dsp:
-            if key.endswith(sfx):
-                if dsp[key].attrs["standard_name"] == getattr(SNAMES, "ws"):
-                    ws = (dsp[key].values * taro.data._parse_quantity(dsp[key].attrs["units"])).to("m h^-1").value / 1852. # to knots
-                else:
-                    wd = dsp[key].values + 180. # wind to direction
+            if key.endswith(sfx["ws"]):
+                ws = (dsp[key].values * taro.data._parse_quantity(dsp[key].attrs["units"])).to("m h^-1").value / 1852. # to knots
+
+        standard_names = [getattr(SNAMES, "wd")]
+        dsp = self._filter_device(ids=ids, standard_names=standard_names)
+        dsp = dsp.resample(time=res).mean("time",skipna=True).fillna(0)
+        for key in dsp:
+            if key.endswith(sfx["wd"]):
+                wd = dsp[key].values + 180. # wind to direction
 
         u,v = ws*np.sin(np.deg2rad(wd)), ws*np.cos(np.deg2rad(wd))
         pl = ax.barbs(dsp.time,y*np.ones(dsp.time.size), u,v,pivot='middle')
