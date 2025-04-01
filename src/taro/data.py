@@ -339,8 +339,8 @@ def to_l1b(ds_l1a, resolution, *, config=None):
         for key in ds_l1b:
             if key.startswith("wind_direction") and not (key.endswith("min") or key.endswith("std")):
                 tvals = ds_l1b[key].values
-                tvals -= ds_l1b["compass"].values
-                tvals[tvals<0] += 360.
+                tvals += ds_l1b["compass"].values
+                tvals[tvals>360] -= 360.
                 ds_l1b[key].values = tvals
                 ds_l1b[key].attrs.update({"comment": "Corrected with sensor compass."})
 
