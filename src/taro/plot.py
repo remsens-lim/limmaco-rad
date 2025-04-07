@@ -751,10 +751,13 @@ class TAROQuicklooks:
             id = dsp[var].attrs["ID"]
             varlabel = f"{var}, {id}"
             pl = ax.plot(dsp.time,F,label=varlabel)
+
+        ax.set_xlim((dsp.time.values[0].astype("datetime64[D]"),
+                     dsp.time.values[0].astype("datetime64[D]") + np.timedelta64(23 * 60 + 59, 'm')))
         ax.legend()
         ax.set_ylabel("shortwave irradiance at night (W m-2)", ha='left', va='top',rotation='horizontal')
-
         ax.grid(True)
+        ax.xaxis.set_major_formatter(mdates.ConciseDateFormatter(ax.xaxis.get_major_locator()))
         return pl
 
         
