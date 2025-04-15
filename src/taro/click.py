@@ -187,6 +187,16 @@ def process_l1b(input_files,
             )
             ds_l1a = ds_l1a.interpolate_na('time')
 
+            # check if flux variables are in l1a, else skip
+            skip_day = False
+            for var in config["l1b_flux_variables"]:
+                var = f"raw_{var}"
+                if var not in ds_l1a:
+                    logger.warning(f"Skip {day:%Y-%m-%d}, as {var} is missing defined by config['l1b_flux_variables']: {config['l1b_flux_variables']}.")
+                    skip_day = True
+            if skip_day:
+                continue
+
             logger.info("Call taro.data.to_l1b")
             ds = taro.data.to_l1b(
                 ds_l1a,
