@@ -21,7 +21,10 @@ import taro.data
 import taro.plot
 import taro.keogram
 
-
+mpl_logger = logging.getLogger("matplotlib")
+mpl_logger.setLevel(logging.WARNING)
+parse_logger = logging.getLogger("parse")
+parse_logger.setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 
 DEFAULT_CONFIG = fn_config = os.path.join(
@@ -108,15 +111,16 @@ def process_l1a(input_files,
                                    config['fname_out'])
             outfile = outfile.format_map(fname_info)
             if skip_exists and os.path.exists(outfile):
+                logger.info(f"Skip process_l1a for {os.path.basename(fn)} -  already exists.")
                 continue
 
-            logger.info("Call taro.data.to_l1a")
+            logger.info(f"Call taro.data.to_l1a for {os.path.basename(fn)}")
             ds = taro.data.to_l1a(
                fname=fn,
                config=config
             )
             if ds is None:
-                logger.warning(f"Skip {fn}.")
+                logger.warning(f"Skip {os.path.basename(fn)} - dataset is None.")
                 continue
 
             taro.futils.to_netcdf(
@@ -178,7 +182,10 @@ def process_l1b(input_files,
                                    config['fname_out'])
             outfile = outfile.format_map(fname_info)
             if skip_exists and os.path.exists(outfile):
+                logger.info(f"Skip process_l1b for {day:%Y-%m-%d} -  already exists.")
                 continue
+
+            logger.info(f"For l1b processing at day {day:%Y-%m-%d}, merge: {[os.path.basename(fn) for fn in files]}")
 
             ds_l1a = taro.futils.merge_with_rename(
                 [xr.load_dataset(fn) for fn in files],
@@ -197,14 +204,14 @@ def process_l1b(input_files,
             if skip_day:
                 continue
 
-            logger.info("Call taro.data.to_l1b")
+            logger.info(f"Call taro.data.to_l1b for day {day:%Y-%m-%d}")
             ds = taro.data.to_l1b(
                 ds_l1a,
                 resolution=resolution,
                 config=config
             )
             if ds is None:
-                logger.warning(f"Skip {fn}.")
+                logger.warning(f"Skip {fn} - dataset is None.")
                 continue
 
             taro.futils.to_netcdf(
@@ -250,8 +257,10 @@ def ql_data(input_files, output_path, skip_exists, config,dpi):
                                    config['fname_out'])
             outfile = outfile.format_map(fname_info)
             if skip_exists and os.path.exists(outfile):
+                logger.info(f"Skip ql_data for {fn} -  already exists.")
                 continue
 
+            logger.info(f"Call quicklook data for {os.path.basename(fn)}")
             ds_l1b = xr.load_dataset(fn)
             fig = plt.figure(figsize=(8, 12))
             axs = [
@@ -308,7 +317,10 @@ def ql_quality(input_files: list, output_path: str, skip_exists:bool, config: di
                                    config['fname_out'])
             outfile = outfile.format_map(fname_info)
             if skip_exists and os.path.exists(outfile):
+                logger.info(f"Skip ql_quality for {fn} -  already exists.")
                 continue
+
+            logger.info(f"Call quicklook quality for {os.path.basename(fn)}")
 
             ds_l1b = xr.load_dataset(fn)
             fig, axs = plt.subplots(4, 1, figsize=(10, 12), constrained_layout=True,
