@@ -747,7 +747,7 @@ class TAROQuicklooks:
         dsp = dsp.where(self.ds.szen>100)
 
         for var in dsp:
-            F = dsp[var] + dsp[var].attrs["dark_offset"]*1e6/dsp[var].attrs["calibration_factor"]
+            F = dsp[var] # + dsp[var].attrs["dark_offset"]*1e6/dsp[var].attrs["calibration_factor"]
             id = dsp[var].attrs["ID"]
             varlabel = f"{var}, {id}"
             pl = ax.plot(dsp.time,F,label=varlabel)
