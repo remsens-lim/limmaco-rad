@@ -110,6 +110,8 @@ Alias SR300_2_calib(4) = SR300_2_temperature_compensation_c
 'Define Subroutines
 '==================
 
+
+
 Sub SR300_float_to_register (F As Float, R(2) As Long)
   ' Convert a 32bit float to two 16bit integers according to IEEE754 standart
   Dim Sign As Long
@@ -258,7 +260,10 @@ Sub SR300_set_modbus_addr(Newaddr As Long,ComPort,Addr,ResultCode)
   Call SR300_soft_reboot(ComPort,Addr,ResultCode)
 EndSub
 
-
+Sub SR300_persistent_calib(ComPort, Addr, ResultCode)
+  SerialFlush(ComPort)
+  ModbusClient(ResultCode,ComPort,SR300_BaudRate,Addr,6,&hffff,&h0321,1,3,100,3)
+EndSub
 
 '===========================================================================
 'Main Program
@@ -305,6 +310,12 @@ BeginProg
   Delay (0,2,Sec)' wait boot sequence of SR300
   If Persistent Then
     CalibStatus = "Make Calibration Persitent ..."
+    If Calib_SR300_1 Then
+      Call SR300_persistent_calib(SR300_1_ComPort,SR300_1_ModbusAddr,ResultCodeSR300_1)
+    EndIf
+    If Calib_SR300_2 Then
+      Call SR300_persistent_calib(SR300_2_ComPort,SR300_2_ModbusAddr,ResultCodeSR300_2)
+    EndIf
     Delay (0,2,Sec)
     SR300_soft_reboot(SR300_1_ComPort,SR300_1_ModbusAddr,ResultCodeSR300_1)
     SR300_soft_reboot(SR300_2_ComPort,SR300_2_ModbusAddr,ResultCodeSR300_2)
