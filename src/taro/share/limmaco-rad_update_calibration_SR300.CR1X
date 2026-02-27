@@ -1,0 +1,324 @@
+'CR1000X Series Datalogger
+'Date: 2025-03-20
+'Program author: Jonas Witthuhn
+
+'Declare Constants
+Public CalibStatus As String = "Start Programm"
+'===========================================================================
+'===========================================================================
+'Configuration
+'=============
+
+Dim Calib_SR300_1 As Boolean = 1 ' Calibration of SR300_1?  0=False, 1=True
+Public NewSensitivity_SR300_1 As Float = 1.013892*10^(-5) ' New Sensitivity V W-1 m2
+Public NewCalibDate_SR300_1 As Long = 20241122 'YYYYMMDD  Calibration date
+
+Dim Calib_SR300_2 As Boolean = 0 ' Calibration of SR300_2?  0=False, 1=True
+Public NewSensitivity_SR300_2 As Float = 1.013892*10^(-5) ' New Sensitivity V W-1 m2
+Public NewCalibDate_SR300_2 As Long = 20241122 'YYYYMMDD  Calibration date
+
+Public Persistent As Boolean = 0 ' Make Calibration Persistent? 0=False, 1=True
+
+'===========================================================================
+'===========================================================================
+' Only edit below if you know what you are doing:
+
+
+Const SR300_BaudRate As Long = 115200
+Const SR300_1_ModbusAddr = 1 ' Modbus Address configured for SR300_1
+Const SR300_2_ModbusAddr = 2 ' Modbus Address configured for SR300_2
+Const SR300_1_ComPort = ComC5 ' ComPort for SR300_1
+Const SR300_2_ComPort = ComC5 ' ComPort for SR300_2
+
+
+'Declare Public Variables
+'=========================
+Public ResultCodeSR300_1 ' Serial communication result code
+Public ResultCodeSR300_2 ' Serial communication result code
+
+Public SR300_1_cdate As String
+Public SR300_1_calib(4) As Float
+
+Public SR300_2_cdate As String
+Public SR300_2_calib(4) As Float
+
+
+Public XHistory_SR300_1_Sensitivity(6) As Float
+Public XHistory_SR300_1_Cdate(6) As String
+Public XHistory_SR300_2_Sensitivity(6) As Float
+Public XHistory_SR300_2_Cdate(6) As String
+
+
+Alias XHistory_SR300_1_Sensitivity(1) = XHistory1_SR300_1_sensitivity : Units XHistory1_SR300_1_sensitivity = V W-1 m2
+Alias XHistory_SR300_1_Sensitivity(2) = XHistory2_SR300_1_sensitivity : Units XHistory2_SR300_1_sensitivity = V W-1 m2
+Alias XHistory_SR300_1_Sensitivity(3) = XHistory3_SR300_1_sensitivity : Units XHistory3_SR300_1_sensitivity = V W-1 m2
+Alias XHistory_SR300_1_Sensitivity(4) = XHistory4_SR300_1_sensitivity : Units XHistory4_SR300_1_sensitivity = V W-1 m2
+Alias XHistory_SR300_1_Sensitivity(5) = XHistory5_SR300_1_sensitivity : Units XHistory5_SR300_1_sensitivity = V W-1 m2
+Alias XHistory_SR300_1_Sensitivity(6) = XHistory6_SR300_1_sensitivity : Units XHistory6_SR300_1_sensitivity = V W-1 m2
+
+Alias XHistory_SR300_1_Cdate(1) = XHistory1_SR300_1_cdate
+Alias XHistory_SR300_1_Cdate(2) = XHistory2_SR300_1_cdate
+Alias XHistory_SR300_1_Cdate(3) = XHistory3_SR300_1_cdate
+Alias XHistory_SR300_1_Cdate(4) = XHistory4_SR300_1_cdate
+Alias XHistory_SR300_1_Cdate(5) = XHistory5_SR300_1_cdate
+Alias XHistory_SR300_1_Cdate(6) = XHistory6_SR300_1_cdate
+
+
+Alias XHistory_SR300_2_Sensitivity(1) = XHistory1_SR300_2_sensitivity : Units XHistory1_SR300_2_sensitivity = V W-1 m2
+Alias XHistory_SR300_2_Sensitivity(2) = XHistory2_SR300_2_sensitivity : Units XHistory2_SR300_2_sensitivity = V W-1 m2
+Alias XHistory_SR300_2_Sensitivity(3) = XHistory3_SR300_2_sensitivity : Units XHistory3_SR300_2_sensitivity = V W-1 m2
+Alias XHistory_SR300_2_Sensitivity(4) = XHistory4_SR300_2_sensitivity : Units XHistory4_SR300_2_sensitivity = V W-1 m2
+Alias XHistory_SR300_2_Sensitivity(5) = XHistory5_SR300_2_sensitivity : Units XHistory5_SR300_2_sensitivity = V W-1 m2
+Alias XHistory_SR300_2_Sensitivity(6) = XHistory6_SR300_2_sensitivity : Units XHistory6_SR300_2_sensitivity = V W-1 m2
+
+Alias XHistory_SR300_2_Cdate(1) = XHistory1_SR300_2_cdate
+Alias XHistory_SR300_2_Cdate(2) = XHistory2_SR300_2_cdate
+Alias XHistory_SR300_2_Cdate(3) = XHistory3_SR300_2_cdate
+Alias XHistory_SR300_2_Cdate(4) = XHistory4_SR300_2_cdate
+Alias XHistory_SR300_2_Cdate(5) = XHistory5_SR300_2_cdate
+Alias XHistory_SR300_2_Cdate(6) = XHistory6_SR300_2_cdate
+
+
+'Declare Private Variables
+'=========================
+Dim i
+Dim HistNo
+
+'Define Alias
+'=============
+Alias SR300_1_cdate = SR300_1_calibration_date
+Alias SR300_1_calib(1) = SR300_1_sensitivity : Units SR300_1_sensitivity = V W-1 m2
+Alias SR300_1_calib(2) = SR300_1_temperature_compensation_a : Units SR300_1_temperature_compensation_a = degC-2
+Alias SR300_1_calib(3) = SR300_1_temperature_compensation_b : Units SR300_1_temperature_compensation_b = degC-1
+Alias SR300_1_calib(4) = SR300_1_temperature_compensation_c
+
+Alias SR300_2_cdate = SR300_2_calibration_date
+Alias SR300_2_calib(1) = SR300_2_sensitivity : Units SR300_2_sensitivity = V W-1 m2
+Alias SR300_2_calib(2) = SR300_2_temperature_compensation_a : Units SR300_2_temperature_compensation_a = degC-2
+Alias SR300_2_calib(3) = SR300_2_temperature_compensation_b : Units SR300_2_temperature_compensation_b = degC-1
+Alias SR300_2_calib(4) = SR300_2_temperature_compensation_c
+
+
+  
+' For Debugging uncomment the next two lines and set the size of the ITimes 
+' array to number of lines of this program.
+' This will count the time spend per line in the programm. ITimes values are
+' shown in the Public Table in the Connect Screen.
+'Public ITimes(524) As Long
+'InstructionTimes(ITimes())
+
+'Define Subroutines
+'==================
+
+Sub SR300_float_to_register (F As Float, R(2) As Long)
+  ' Convert a 32bit float to two 16bit integers according to IEEE754 standart
+  Dim Sign As Long
+  Dim Exponent
+  Dim Remainder As Float
+  Dim Fraction As Float
+  Dim Value As Long
+  Dim i
+  ' init 
+  Sign = 0
+  Exponent = -128
+  Value = 0
+  R(1) = 0
+  R(2) = 0
+  ' Set sign 1 if negative
+  If F < 0 Then 
+    Sign = 1
+  EndIf
+  ' Find exponent
+  While ABS(F)>2^Exponent
+    Exponent = Exponent + 1
+  Wend 
+  Exponent = Exponent - 1
+  ' Calculate Remainder Value
+  Remainder = (ABS(F)/(2^Exponent)) - 1
+  For i = 1 To 23
+    Fraction = 1.0 / (2^i)
+    If Remainder >= Fraction Then
+      Remainder = Remainder - Fraction
+      Value = Value + 2^(23-i)
+    EndIf
+  Next i
+  ' Transfer into two 16-bit integer registers
+  R(1) = Sign<<15
+  R(1) = R(1) + ((Exponent + 127)<<7)
+  R(1) = R(1) + (Value>>16)
+  R(2) = Value - ((Value>>16)<<16)
+EndSub
+
+Sub SR300_convert_string32 (register_data(16), str As String)
+  ' Convert D300 string32 register data to String
+  Dim i
+  str = ""
+  For i=1 To 16
+    str = str + CHR((register_data(i) AND (2^8-1)))
+    str = str + CHR(((register_data(i) AND ((2^8-1)<<8))>>8))
+  Next i
+EndSub
+
+Sub SR300_convert_u64_to_datetime(register_data(4), datestr As String)
+  Dim date As Long
+  Dim tyear,tmonth,tday
+  date = register_data(3)<<16 OR register_data(4)
+  datestr = ""
+  tyear = Floor(date / 10000)
+  tmonth = Floor((date - (tyear*10000))/100)
+  tday = date - tmonth*100 - tyear*10000
+  datestr = datestr + FormatLong(tyear,"%4d") + "-"
+  datestr = datestr + FormatLong(tmonth,"%02d") + "-"
+  datestr = datestr + FormatLong(tday,"%02d")
+EndSub
+
+Sub SR300_convert_datetime_to_u64(datestr, register_data(4) as Long)
+  Dim date As Long
+  Dim syear,smonth,sday As String
+  Dim tyear,tmonth,tday As Long
+  register_data(1) = 0
+  register_data(2) = 0
+  register_data(3) = 0
+  register_data(4) = 0
+  ' get the substring from the format YYYY-MM-DD
+  tyear = Mid(datestr,1,4)
+  tmonth = Mid(datestr,5,2)
+  tday = Mid(datestr,7,2)
+  date = tyear*10000 + tmonth*100 + tday
+  ' write into register
+  register_data(3) = date>>16
+  register_data(4) = date - (register_data(3)<<16)
+EndSub
+
+Sub SR300_read_calib_hist (ComPort, Addr, ResultCode, HistNo As Long, CalibDate As String, Sensitivity As Float)
+  ' Read Calibration Date, Sensitivity and compensation factors
+  Dim RegisterDate(4) As Long
+  Dim DateRegister, SensRegister As Long
+  DateRegister = 825 + (10*HistNo)
+  SensRegister = 823 + (10*HistNo)
+  SerialFlush(ComPort)
+  ModbusClient (ResultCode,ComPort,SR300_BaudRate,Addr,3,RegisterDate(),DateRegister,4,3,100,3)
+  Call SR300_convert_u64_to_datetime(RegisterDate(),CalibDate)
+  SerialFlush(ComPort)
+  ModbusClient (ResultCode,ComPort,SR300_BaudRate,Addr,3,Sensitivity,SensRegister,1,3,100,2)
+EndSub
+
+Sub SR300_read_calib (ComPort, Addr, ResultCode, CalibDate As String, Result(4) As Float)
+  ' Read Calibration Date, Sensitivity and compensation factors
+  Dim RegisterDate(4) As Long
+    SerialFlush(ComPort)
+  ModbusClient (ResultCode,ComPort,SR300_BaudRate,Addr,3,RegisterDate(),&h0303,4,3,100,3)
+  Call SR300_convert_u64_to_datetime(RegisterDate(),CalibDate)
+    SerialFlush(ComPort)
+  ModbusClient (ResultCode,ComPort,SR300_BaudRate,Addr,3,result(1),&h0301,1,3,100,2)
+    SerialFlush(ComPort)
+  ModbusClient (ResultCode,ComPort,SR300_BaudRate,Addr,3,result(2),&h030d,3,3,100,2)
+EndSub
+
+Sub SR300_write_calib(ComPort, Addr, ResultCode, CalibDate As Long, Sensitivity As Float)
+  Dim NewDateRegister(4) As Long
+  Dim NewCalibRegister(2) As Long
+  NewDateRegister(1) = 0
+  NewDateRegister(2) = 0
+  NewDateRegister(3) = CalibDate>>16
+  NewDateRegister(4) = CalibDate - ((CalibDate>>16)<<16)
+  NewCalibRegister(1) = 0
+  NewCalibRegister(2) = 0
+  'Call SR300_convert_datetime_to_u64 (CalibDate, NewDateRegister)
+  Call SR300_float_to_register (Sensitivity, NewCalibRegister)
+  ' write new sensitivity to registers 0x0301 and 0x0302
+  SerialFlush(ComPort)
+  ModbusClient (ResultCode,ComPort,SR300_BaudRate,Addr,6,NewCalibRegister(1),&h0301,1,3,100,3)
+  SerialFlush(ComPort)
+  ModbusClient (ResultCode,ComPort,SR300_BaudRate,Addr,6,NewCalibRegister(2),&h0302,1,3,100,3)
+  ' write new calibration date to registers 0x0303 - 0x0306
+  SerialFlush(ComPort)
+  ModbusClient (ResultCode,ComPort,SR300_BaudRate,Addr,6,NewDateRegister(1),&h0303,1,3,100,3)
+  SerialFlush(ComPort)
+  ModbusClient (ResultCode,ComPort,SR300_BaudRate,Addr,6,NewDateRegister(2),&h0304,1,3,100,3)
+  SerialFlush(ComPort)
+  ModbusClient (ResultCode,ComPort,SR300_BaudRate,Addr,6,NewDateRegister(3),&h0305,1,3,100,3)
+  SerialFlush(ComPort)
+  ModbusClient (ResultCode,ComPort,SR300_BaudRate,Addr,6,NewDateRegister(4),&h0306,1,3,100,3)
+EndSub
+
+Sub SR300_save_calib(ComPort, Addr, ResultCode)
+EndSub
+
+Sub SR300_soft_reboot(ComPort,Addr,ResultCode)
+  ' Do a soft reboot of the SR300 sensor
+    SerialFlush(ComPort)
+  ModbusClient(ResultCode,ComPort,SR300_BaudRate,Addr,6,&h587f,&h0902,1,3,100,3)
+EndSub
+
+Sub SR300_set_modbus_addr(Newaddr As Long,ComPort,Addr,ResultCode)
+  ' Set ModbusAddress and reboot
+    SerialFlush(ComPort)
+  ModbusClient(ResultCode,ComPort,SR300_BaudRate,Addr,6,Newaddr,1,1,3,100,3)
+  Call SR300_soft_reboot(ComPort,Addr,ResultCode)
+EndSub
+
+
+
+'===========================================================================
+'Main Program
+'============
+BeginProg
+ 
+   CalibStatus = "Rebooting SR300"
+  ' Switch on SW12_2, because one of the SR300 Pyranometers is connected to it
+  SW12 (SW12_2, 1)
+  Delay (0,10,Sec)' wait boot sequence of SR300
+  ' Serial Channel configuration for ModBus operation
+  ' of SR300 Pyranometers and WS500 Weather station
+  ' -> 115200 baud, low, even parity, one stop bit
+  SerialOpen (ComC5,SR300_BaudRate,2,0,50,3)
+  SR300_soft_reboot(SR300_1_ComPort,SR300_1_ModbusAddr,ResultCodeSR300_1)
+  SR300_soft_reboot(SR300_2_ComPort,SR300_2_ModbusAddr,ResultCodeSR300_2)
+  Delay (0,10,Sec)' wait boot sequence of SR300
+
+  CalibStatus = "Read Old Calibration:"
+  ' Read SR300 Calibration Information
+  Call SR300_read_calib (SR300_1_ComPort,SR300_1_ModbusAddr,ResultCodeSR300_1,SR300_1_cdate,SR300_1_calib())
+  For i=1 To 4
+    If SR300_1_calib(i)=0 Then Restart
+  Next i
+  Call SR300_read_calib (SR300_2_ComPort,SR300_2_ModbusAddr,ResultCodeSR300_2,SR300_2_cdate,SR300_2_calib())
+  For i=1 To 4
+    If SR300_2_calib(i)=0 Then Restart
+  Next i
+  
+  For i=1 To 6
+    Call SR300_read_calib_hist(SR300_1_ComPort,SR300_1_ModbusAddr,ResultCodeSR300_1,i,XHistory_SR300_1_Cdate(i),XHistory_SR300_1_Sensitivity(i))
+    Call SR300_read_calib_hist(SR300_2_ComPort,SR300_2_ModbusAddr,ResultCodeSR300_2,i,XHistory_SR300_2_Cdate(i),XHistory_SR300_2_Sensitivity(i))
+  Next i
+  
+  Delay (0,10,Sec)' wait boot sequence of SR300
+  CalibStatus = "Write New Calibration (not persistent):"
+  If Calib_SR300_1 Then
+    Call SR300_write_calib(SR300_1_ComPort,SR300_1_ModbusAddr,ResultCodeSR300_1,NewCalibDate_SR300_1,NewSensitivity_SR300_1)
+  EndIf
+  If Calib_SR300_2 Then
+    Call SR300_write_calib(SR300_2_ComPort,SR300_2_ModbusAddr,ResultCodeSR300_2,NewCalibDate_SR300_2,NewSensitivity_SR300_2)
+  EndIf
+
+  Delay (0,2,Sec)' wait boot sequence of SR300
+  If Persistent Then
+    CalibStatus = "Make Calibration Persitent ..."
+    Delay (0,2,Sec)
+    SR300_soft_reboot(SR300_1_ComPort,SR300_1_ModbusAddr,ResultCodeSR300_1)
+    SR300_soft_reboot(SR300_2_ComPort,SR300_2_ModbusAddr,ResultCodeSR300_2)
+    Delay (0,10,Sec)
+    CalibStatus = "... Done "
+  EndIf
+  
+  ' read new registers
+  Call SR300_read_calib (SR300_1_ComPort,SR300_1_ModbusAddr,ResultCodeSR300_1,SR300_1_cdate,SR300_1_calib())
+  Call SR300_read_calib (SR300_2_ComPort,SR300_2_ModbusAddr,ResultCodeSR300_2,SR300_2_cdate,SR300_2_calib())
+  For i=1 To 6
+    Call SR300_read_calib_hist(SR300_1_ComPort,SR300_1_ModbusAddr,ResultCodeSR300_1,i,XHistory_SR300_1_Cdate(i),XHistory_SR300_1_Sensitivity(i))
+    Call SR300_read_calib_hist(SR300_2_ComPort,SR300_2_ModbusAddr,ResultCodeSR300_2,i,XHistory_SR300_2_Cdate(i),XHistory_SR300_2_Sensitivity(i))
+  Next i
+  Delay(0,2,Sec)
+  CalibStatus = "... Done"
+EndProg
