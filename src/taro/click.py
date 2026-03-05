@@ -94,7 +94,7 @@ def process_l1a(input_files,
     config = _configure(config)
     taro.utils.init_logger(config)
 
-    with click.progressbar(input_files, label='Processing to l1a:') as files:
+    with click.progressbar(input_files, label='Processing to l1a:', item_show_func=lambda a: os.path.basename(a) if a is not None else "") as files:
         for fn in files:
             fname_info = parse.parse(
                 config["fname_out"],
@@ -163,7 +163,7 @@ def process_l1b(input_files,
     udays, indices = np.unique(fdates, return_inverse=True)
 
 
-    with click.progressbar(udays, label='Processing to l1b:') as days:
+    with click.progressbar(udays, label='Processing to l1b:', item_show_func=lambda a: f"{a:%Y-%m-%d}" if a is not None else "") as days:
         for i, day in enumerate(days):
             ifiles = np.argwhere(indices == i).ravel()
             files = [input_files[j] for j in ifiles]
@@ -240,7 +240,7 @@ def ql_data(input_files, output_path, skip_exists, config,dpi):
     config = _configure(config)
     taro.utils.init_logger(config)
 
-    with click.progressbar(input_files, label='Make daily data quicklooks:') as files:
+    with click.progressbar(input_files, label='Make daily data quicklooks:', item_show_func=lambda a: os.path.basename(a) if a is not None else "") as files:
         for fn in files:
             fname_info = parse.parse(
                 config["fname_out"],
@@ -300,7 +300,7 @@ def ql_quality(input_files: list, output_path: str, skip_exists:bool, config: di
     config = _configure(config)
     taro.utils.init_logger(config)
 
-    with click.progressbar(input_files, label='Make daily quality quicklooks:') as files:
+    with click.progressbar(input_files, label='Make daily quality quicklooks:', item_show_func=lambda a: os.path.basename(a) if a is not None else "") as files:
         for fn in files:
             fname_info = parse.parse(
                 config["fname_out"],
