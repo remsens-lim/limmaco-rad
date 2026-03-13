@@ -150,9 +150,9 @@ def resample(ds, freq, methods='mean', kwargs={}):
 def merge_ds(ds1, ds2, timevar="time"):
     """Merge two datasets along the time dimension.
     """
-    setdifftime = np.setdiff1d(ds2[timevar].values,ds1[timevar].values)
+    setdifftime = np.setdiff1d(ds1[timevar].values,ds2[timevar].values)
     if len(setdifftime) == 0:
-        # no additional time samples are in ds2
+        # no additional time samples are in old ds1
         logger.info("Overwrite existing file.")
         return ds2
     logger.info("Merge with existing file.")
@@ -161,7 +161,7 @@ def merge_ds(ds1, ds2, timevar="time"):
     overwrite_vars = [ v for v in ds1 if timevar not in ds1[v].dims ]
 
     ## just use data unique in ds2
-    ds2 = ds2.interp(time=setdifftime)
+    ds1 = ds1.interp(time=setdifftime)
 
     ## merge both datasets
     ds_new=ds1.merge(ds2,
